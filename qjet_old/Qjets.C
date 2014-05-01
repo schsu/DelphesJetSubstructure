@@ -53,7 +53,7 @@ double Qjets::ComputeNormalization(double dmin){
     if(JetsUnmerged(*it)){
       //cout << "dist; " << -_rigidity*((*it).dij-dmin)/dmin << "  " << dmin << endl;
       double inc = exp(-_rigidity*((*it).dij-dmin)/dmin);
-      assert(inc <= 1. && !isnan(inc));      
+      assert(inc <= 1. && !std::isnan(inc));      
       norm += inc;          
       it++;
     } else 
@@ -80,7 +80,7 @@ void Qjets::Cluster(fastjet::ClusterSequence & cs){
 
     for(list<jet_distance>::iterator it = _distances.begin(); it != _distances.end(); it++){
       sum += exp(-_rigidity*((*it).dij-dmin)/dmin)/norm;
-      assert(!isnan(sum));
+      assert(!std::isnan(sum));
      
       if(sum > rand){
 	if(!Prune((*it),cs)){
@@ -144,7 +144,7 @@ double Qjets::d_ij(const fastjet::PseudoJet& v1,const  fastjet::PseudoJet& v2){
   double p1 = v1.perp();
   double p2 = v2.perp();
   double ret = pow(min(p1,p2),_exp_min) * pow(max(p1,p2),_exp_max) * v1.squared_distance(v2);
-  assert(!isnan(ret));
+  assert(!std::isnan(ret));
   return ret;
 }
 

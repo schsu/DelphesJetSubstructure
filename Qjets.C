@@ -164,7 +164,7 @@ double Qjets::d_ij(const fastjet::PseudoJet& v1,const  fastjet::PseudoJet& v2) c
   double p1 = v1.perp();
   double p2 = v2.perp();
   double ret = pow(min(p1,p2),_exp_min) * pow(max(p1,p2),_exp_max) * v1.squared_distance(v2);
-  assert(!isnan(ret));
+  assert(!std::isnan(ret));
   return ret; 
 }
 
