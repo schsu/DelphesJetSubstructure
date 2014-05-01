@@ -36,7 +36,7 @@ CXXFLAGSLINK = -Wall -g -O3 -Wno-long-long $(FJFLAGS) $(ROOTCFLAGS) $(INCLUDES)
 
 
 FILES = Qjets.o QjetsPlugin.o 
-FILEROOT  = delphroot.o HelperClasses.o LocalSettings.o HiggsAnalysis.o JetSubstructure.o Run.o minituple.o NewQjets.o
+FILEROOT  = HelperClasses.o LocalSettings.o HiggsAnalysis.o JetSubstructure.o Run.o 
 MINIFILES = DelphesNTuple.o miniha.o HiggsHist.o HelperClasses.o LocalSettings.o
 
 all:  $(FILES) $(FILEROOT)  lib/libQjets.a  ha sample miniha
