@@ -12,6 +12,8 @@ AnalyzeSignalForAllMasses() {
     char fileName[1024];
     sprintf(fileName, "mintree_jetsub_a-zh-triple-%dGeV.root", masses[i]);
     HiggsHist(inputFolder, fileName, outputFolder);
+    std::cout << "Done with " << masses[i] << "GeV" << std::endl;
+    std::cout.flush();
   }
 }
 

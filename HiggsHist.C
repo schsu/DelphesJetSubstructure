@@ -62,6 +62,11 @@ void CHiggsHist::IterateOverEvents() {
 
 void CHiggsHist::ProcessEvent() {
   const double minBoostedJetPt = 2.0 * 126.0 / 1.0;
+  // We store all events now, so check if there are exactly two leptons first
+  if ((*mt->leptons_x).size() != 2) {
+    return;
+  }
+
   TLorentzVector l1((*mt->leptons_x)[0], (*mt->leptons_y)[0], (*mt->leptons_z)[0], (*mt->leptons_t)[0]);
   TLorentzVector l2((*mt->leptons_x)[1], (*mt->leptons_y)[1], (*mt->leptons_z)[1], (*mt->leptons_t)[1]);
   TLorentzVector dilepton = l1 + l2;
@@ -74,11 +79,10 @@ void CHiggsHist::ProcessEvent() {
   TLorentzVector boostedJet;
   TLorentzVector rjet1, rjet2;
   Fill("btag4", (double)(*mt->btags10)[0]);
-  std::cout << (*mt->btags10).size() << std::endl;
   // If we are dealing with boosted jets
   if (mt->jets_antikt_4_x->size() < 2 || ((*mt->btags4)[0] & 2) == 0 || ((*mt->btags4)[1] & 2) == 0) {
     // have at least one boosted jet
-    if (mt->jets_antikt_10_x->size() > 0) {
+    if (mt->jets_antikt_10_x->size() > 0 && ((*mt->btags10)[0] & 2) != 0) {
       boostedJet.SetXYZT((*mt->jets_antikt_10_x)[0], (*mt->jets_antikt_10_y)[0], (*mt->jets_antikt_10_z)[0], (*mt->jets_antikt_10_t)[0]);
       if (boostedJet.M() < 85.0 || boostedJet.M() > 165.0) {
 	return;
