@@ -142,14 +142,21 @@ void CHiggsHist::ProcessEvent() {
   }
 }
 
-void HiggsHist(const char* inputFolder, std::vector<const char*> inputFiles, const char* outputFolder) {
+void HiggsHist(const char* inputFolder, std::vector<const char*>& inputFiles, std::vector<double>& crossSections, const char* outputFolder) {
   CHiggsHist hh;
+  if (inputFiles.size() != crossSections.size()) {
+    std::cout << "Input files number and cross sections number have to match!" << std::endl;
+    return;
+  }
+
   std::vector<const char*>::iterator i = inputFiles.begin();
-  hh.Initialize(inputFolder, *i, outputFolder, 1.0);
+  std::vector<double>::iterator ixs = crossSections.begin();
+  hh.Initialize(inputFolder, *i, outputFolder, *ixs);
   hh.IterateOverEvents();
   
   while (++i != inputFiles.end()) {
-    hh.ReInitialize(inputFolder, *i, 1.0);
+    ++ixs;
+    hh.ReInitialize(inputFolder, *i, *ixs);
     hh.IterateOverEvents();
   }
 
