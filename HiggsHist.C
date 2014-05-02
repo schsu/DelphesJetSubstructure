@@ -22,15 +22,17 @@ using namespace std;
 class CHiggsHist : public CAnalysisData
 {
 private:
-	TFile* file;
-	TTree* minitTree;
-	DelphesNTuple* mt;
+  TFile* file;
+  TTree* minitTree;
+  DelphesNTuple* mt;
+  double xsection;
+
 public:
-	CHiggsHist();
-	~CHiggsHist();
-	void Initialize(const char* inputFolder, const char* inputFile, const char* outputFolder);
-	void IterateOverEvents();
-	void ProcessEvent();
+  CHiggsHist();
+  ~CHiggsHist();
+  void Initialize(const char* inputFolder, const char* inputFile, const char* outputFolder, double xs);
+  void IterateOverEvents();
+  void ProcessEvent();
 };
 
 CHiggsHist::CHiggsHist() {
@@ -42,13 +44,14 @@ CHiggsHist::CHiggsHist() {
 CHiggsHist::~CHiggsHist() {
 }
 
-void CHiggsHist::Initialize(const char* inputFolder, const char* inputFile, const char* outputFolder) {
-	string inpFolder(inputFolder);
-	string inpFile(inputFile);
-	file = new TFile((inpFolder + inpFile).c_str());
-	minitTree = (TTree*)file->Get("DelphesNTup");
-	mt = new DelphesNTuple(minitTree);
-	SimpleInitialize(inputFile, inputFolder, "res-");
+void CHiggsHist::Initialize(const char* inputFolder, const char* inputFile, const char* outputFolder, double xs) {
+  xsection = xs;
+  string inpFolder(inputFolder);
+  string inpFile(inputFile);
+  file = new TFile((inpFolder + inpFile).c_str());
+  minitTree = (TTree*)file->Get("DelphesNTup");
+  mt = new DelphesNTuple(minitTree);
+  SimpleInitialize(inputFile, inputFolder, "res-");
 }
 
 void CHiggsHist::IterateOverEvents() {
@@ -61,11 +64,14 @@ void CHiggsHist::IterateOverEvents() {
 }
 
 void CHiggsHist::ProcessEvent() {
+  Fill("Flow Cut", 10);
   const double minBoostedJetPt = 2.0 * 126.0 / 1.0;
   // We store all events now, so check if there are exactly two leptons first
   if ((*mt->leptons_x).size() != 2) {
     return;
   }
+
+  Fill("Flow Cut", 20);
 
   TLorentzVector l1((*mt->leptons_x)[0], (*mt->leptons_y)[0], (*mt->leptons_z)[0], (*mt->leptons_t)[0]);
   TLorentzVector l2((*mt->leptons_x)[1], (*mt->leptons_y)[1], (*mt->leptons_z)[1], (*mt->leptons_t)[1]);
@@ -88,10 +94,12 @@ void CHiggsHist::ProcessEvent() {
 	return;
       }
 
+      Fill("Flow Cut", 40);
       if (boostedJet.Pt() < minBoostedJetPt) {
 	return;
       }
 
+      Fill("Flow Cut", 50);
       Fill("btag", (*mt->btags10)[0]);
       Fill("m(bb),b", boostedJet.M());
       Fill("pt(bb),b", boostedJet.Pt());
@@ -100,6 +108,8 @@ void CHiggsHist::ProcessEvent() {
       Fill("deltaPhi(h,z),b", boostedJet.DeltaPhi(dilepton));
       Fill("pt(llbb),b", (boostedJet+dilepton).Pt());
     }
+    
+    Fill("Flow Cut", 30);
   } else {     
     rjet1.SetXYZT((*mt->jets_antikt_4_x)[0], (*mt->jets_antikt_4_y)[0], (*mt->jets_antikt_4_z)[0], (*mt->jets_antikt_4_t)[0]);
     rjet2.SetXYZT((*mt->jets_antikt_4_x)[1], (*mt->jets_antikt_4_y)[1], (*mt->jets_antikt_4_z)[1], (*mt->jets_antikt_4_t)[1]);
@@ -108,6 +118,8 @@ void CHiggsHist::ProcessEvent() {
       return;
     }
 
+    Fill("Flow Cut", 40);
+    Fill("Flow Cut", 50);
     Fill("m(bb),r", dijet.M());
     Fill("m(llbb),r", (dijet + dilepton).M());
     Fill("deltaR(h,z),r", dijet.DeltaR(dilepton));
@@ -119,7 +131,7 @@ void CHiggsHist::ProcessEvent() {
 
 void HiggsHist(const char* inputFolder, const char* inputFile, const char* outputFolder) {
 	CHiggsHist hh;
-	hh.Initialize(inputFolder, inputFile, outputFolder);
+	hh.Initialize(inputFolder, inputFile, outputFolder, 1.0);
 	hh.IterateOverEvents();
 	hh.SaveResults();
 }
