@@ -6,6 +6,10 @@
 #include "HiggsHist.h"
 
 void
+AnalyzeBackground() {
+}
+
+void
 AnalyzeSignalForAllMasses() {
   int masses[] = { 250, 300, 350, 400, 500, 600, 700, 800, 900, 1000 };
   for (int i = 0; i < sizeof(masses)/sizeof(masses[0]); ++i) {

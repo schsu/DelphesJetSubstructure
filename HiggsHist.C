@@ -31,6 +31,7 @@ public:
   CHiggsHist();
   ~CHiggsHist();
   void Initialize(const char* inputFolder, const char* inputFile, const char* outputFolder, double xs);
+  void ReInitialize(const char* inputFolder, const char* inputFile, double xs);
   void IterateOverEvents();
   void ProcessEvent();
 };
@@ -54,13 +55,25 @@ void CHiggsHist::Initialize(const char* inputFolder, const char* inputFile, cons
   SimpleInitialize(inputFile, inputFolder, "res-");
 }
 
+void CHiggsHist::ReInitialize(const char* inputFolder, const char* inputFile, double xs) {
+  xsection = xs;
+  string inpFolder(inputFolder);
+  file = new TFile((inpFolder + inputFile).c_str());
+  minitTree = (TTree*)file->Get("DelphesNTup");
+  mt = new DelphesNTuple(minitTree);
+  // No need to call SimpleInitialize - the output file is already open
+}
+
 void CHiggsHist::IterateOverEvents() {
-	for (Long64_t i = 0; i < mt->fChain->GetEntriesFast(); ++i) {
-		Long64_t ientry = mt->LoadTree(i);
-		if (ientry < 0) break;
-		mt->fChain->GetEntry(i);
-		ProcessEvent();
-	}
+  for (Long64_t i = 0; i < mt->fChain->GetEntriesFast(); ++i) {
+    Long64_t ientry = mt->LoadTree(i);
+    if (ientry < 0) { 
+      break;
+    }
+    
+    mt->fChain->GetEntry(i);
+    ProcessEvent();
+  }
 }
 
 void CHiggsHist::ProcessEvent() {
@@ -129,9 +142,23 @@ void CHiggsHist::ProcessEvent() {
   }
 }
 
+void HiggsHist(const char* inputFolder, std::vector<const char*> inputFiles, const char* outputFolder) {
+  CHiggsHist hh;
+  std::vector<const char*>::iterator i = inputFiles.begin();
+  hh.Initialize(inputFolder, *i, outputFolder, 1.0);
+  hh.IterateOverEvents();
+  
+  while (++i != inputFiles.end()) {
+    hh.ReInitialize(inputFolder, *i, 1.0);
+    hh.IterateOverEvents();
+  }
+
+  hh.SaveResults();
+}
+
 void HiggsHist(const char* inputFolder, const char* inputFile, const char* outputFolder) {
-	CHiggsHist hh;
-	hh.Initialize(inputFolder, inputFile, outputFolder, 1.0);
-	hh.IterateOverEvents();
-	hh.SaveResults();
+  CHiggsHist hh;
+  hh.Initialize(inputFolder, inputFile, outputFolder, 1.0);
+  hh.IterateOverEvents();
+  hh.SaveResults();
 }
