@@ -61,6 +61,7 @@ void CHiggsHist::ReInitialize(const char* inputFolder, const char* inputFile, do
   file = new TFile((inpFolder + inputFile).c_str());
   minitTree = (TTree*)file->Get("DelphesNTup");
   mt = new DelphesNTuple(minitTree);
+  std::cout << inputFile << std::endl;
   // No need to call SimpleInitialize - the output file is already open
 }
 
@@ -151,7 +152,7 @@ void HiggsHist(const char* inputFolder, std::vector<const char*>& inputFiles, st
 
   std::vector<const char*>::iterator i = inputFiles.begin();
   std::vector<double>::iterator ixs = crossSections.begin();
-  hh.Initialize(inputFolder, *i, outputFolder, *ixs);
+  hh.ReInitialize(inputFolder, *i, *ixs);
   hh.IterateOverEvents();
   
   while (++i != inputFiles.end()) {
@@ -160,6 +161,7 @@ void HiggsHist(const char* inputFolder, std::vector<const char*>& inputFiles, st
     hh.IterateOverEvents();
   }
 
+  hh.SimpleInitialize("background.root", inputFolder, "res-");
   hh.SaveResults();
 }
 
