@@ -1,7 +1,5 @@
 #include "QjetsPlugin.h"
 
-namespace fastqjets {
-
 QjetsPlugin::QjetsPlugin(double zcut, double dcut_fctr, double exp_min, double exp_max, double rigidity, double truncation_fctr)
   : _zcut(zcut), 
     _dcut_fctr(dcut_fctr), 
@@ -32,6 +30,4 @@ void QjetsPlugin::run_clustering(fastjet::ClusterSequence & cs) const{
   if(_rand_seed_set)
     qjets.SetRandSeed(_seed);
   qjets.Cluster(cs);
-}
-
 }

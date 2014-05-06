@@ -1,5 +1,5 @@
-#ifndef _QJETS_NEW_
-#define _QJETS_NEW_
+#ifndef _QJETS_
+#define _QJETS_
 #include <queue>
 #include <vector>
 #include <list>
@@ -9,8 +9,6 @@
 #include "fastjet/ClusterSequence.hh"
 
 using namespace std;
-
-namespace fastqjets {
 
 struct jet_distance{
   double dij;
@@ -51,6 +49,4 @@ class Qjets{
   void Cluster(fastjet::ClusterSequence & cs);
   void SetRandSeed(unsigned int seed); /* In case you want reproducible behavior */
 };
-
-}
 #endif

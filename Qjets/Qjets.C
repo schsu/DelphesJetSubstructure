@@ -1,7 +1,5 @@
 #include "Qjets.h"
 
-namespace fastqjets {
-
 Qjets::Qjets(double zcut, double dcut_fctr, double exp_min, double exp_max, double rigidity, double truncation_fctr)
   : _zcut(zcut), 
     _dcut_fctr(dcut_fctr),
@@ -164,7 +162,7 @@ double Qjets::d_ij(const fastjet::PseudoJet& v1,const  fastjet::PseudoJet& v2) c
   double p1 = v1.perp();
   double p2 = v2.perp();
   double ret = pow(min(p1,p2),_exp_min) * pow(max(p1,p2),_exp_max) * v1.squared_distance(v2);
-  assert(!std::isnan(ret));
+  assert(!isnan(ret));
   return ret; 
 }
 
@@ -175,6 +173,4 @@ double Qjets::Rand(){
   else 
     ret = rand()/(double)RAND_MAX;
   return ret;
-}
-
 }

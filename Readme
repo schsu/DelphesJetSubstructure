@@ -1,0 +1,24 @@
+Welcome to JetsubEX!
+
+JetsubEX is a pack of ROOT macros to calculate Qjet variables and Nsubjettiness with Delphes file input.
+Before we start, you need to do servral things to make this run correctly.
+
+
+1. Make sure FastJet plugin is installed on the system.
+   The lastest Fastjet plugin can be found here: http://fastjet.fr/
+
+2. The DELPHESPATH variable in makefile should be redefined to the correct path of Delphes.
+   Go to the makefile and change it.
+
+3. Every thing is ready.
+   Open the Terminal, source ROOT, cd this Folder and type $make.
+   If you're lucky enough, shared library JetSub.so should be compiled now.
+   
+4. Runtime commands are stored in Exc.C, you need to provide the name of Delphes ROOT file being Analyzed.
+   Open ROOT and type .x Exc.C , get yourself a cup of tea and see the anlysis result.
+   You can also change the Exc.C macro to alter the analyzing contents.
+
+   
+If you have any problem building or running the macro, feel free to contract me.
+
+Simon Lin <N.Sibetz@gmail.com>
