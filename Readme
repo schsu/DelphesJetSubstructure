@@ -14,11 +14,11 @@ Before we start, you need to do servral things to make this run correctly.
    Open the Terminal, source ROOT, cd this Folder and type $make.
    If you're lucky enough, shared library JetSub.so should be compiled now.
    
-4. Runtime commands are stored in Exc.C, you need to provide the name of Delphes ROOT file being Analyzed.
-   Open ROOT and type .x Exc.C , get yourself a cup of tea and see the anlysis result.
+4. Runtime commands are stored in Exc.C, you need to provide the name of Delphes ROOT file being analyzed.
+   Open ROOT and type .x Exc.C , get yourself a cup of tea and see the analysis result.
    You can also change the Exc.C macro to alter the analyzing contents.
 
    
-If you have any problem building or running the macro, feel free to contract me.
+If you have any problem building or running the macro, feel free to contact me.
 
 Simon Lin <N.Sibetz@gmail.com>
