@@ -26,6 +26,7 @@ private:
   TTree* minitTree;
   DelphesNTuple* mt;
   double xsection;
+  int eventCount;
 
 public:
   CHiggsHist();
@@ -34,12 +35,14 @@ public:
   void ReInitialize(const char* inputFolder, const char* inputFile, double xs);
   void IterateOverEvents();
   void ProcessEvent();
+  void ProcessHistograms();
 };
 
 CHiggsHist::CHiggsHist() {
 	file = NULL;
 	minitTree = NULL;
 	mt = NULL;
+	eventCount = 0;
 }
 
 CHiggsHist::~CHiggsHist() {
@@ -78,14 +81,19 @@ void CHiggsHist::IterateOverEvents() {
 }
 
 void CHiggsHist::ProcessEvent() {
-  Fill("Flow Cut", 10);
+  double btagEfficiency = 0.6;
+  eventCount++;
+
+  Fill("Flow Cut, r", 10);
+  Fill("Flow Cut, b", 10);
   const double minBoostedJetPt = 2.0 * 126.0 / 1.0;
   // We store all events now, so check if there are exactly two leptons first
   if ((*mt->leptons_x).size() != 2) {
     return;
   }
 
-  Fill("Flow Cut", 20);
+  Fill("Flow Cut, r", 20);
+  Fill("Flow Cut, b", 20);
 
   TLorentzVector l1((*mt->leptons_x)[0], (*mt->leptons_y)[0], (*mt->leptons_z)[0], (*mt->leptons_t)[0]);
   TLorentzVector l2((*mt->leptons_x)[1], (*mt->leptons_y)[1], (*mt->leptons_z)[1], (*mt->leptons_t)[1]);
@@ -102,29 +110,28 @@ void CHiggsHist::ProcessEvent() {
   // If we are dealing with boosted jets
   if (mt->jets_antikt_4_x->size() < 2 || ((*mt->btags4)[0] & 2) == 0 || ((*mt->btags4)[1] & 2) == 0) {
     // have at least one boosted jet
+    Fill("Flow Cut, b", 30);
     if (mt->jets_antikt_10_x->size() > 0 && ((*mt->btags10)[0] & 2) != 0) {
       boostedJet.SetXYZT((*mt->jets_antikt_10_x)[0], (*mt->jets_antikt_10_y)[0], (*mt->jets_antikt_10_z)[0], (*mt->jets_antikt_10_t)[0]);
       if (boostedJet.M() < 85.0 || boostedJet.M() > 165.0) {
 	return;
       }
 
-      Fill("Flow Cut", 40);
+      Fill("Flow Cut, b", 40);
       if (boostedJet.Pt() < minBoostedJetPt) {
 	return;
       }
 
-      Fill("Flow Cut", 50);
-      Fill("btag", (*mt->btags10)[0]);
-      Fill("m(bb),b", boostedJet.M());
-      Fill("pt(bb),b", boostedJet.Pt());
-      Fill("m(llbb),b", (boostedJet + dilepton).M());
-      Fill("deltaR(h,z),b", boostedJet.DeltaR(dilepton));
-      Fill("deltaPhi(h,z),b", boostedJet.DeltaPhi(dilepton));
-      Fill("pt(llbb),b", (boostedJet+dilepton).Pt());
+      Fill("Flow Cut, b", 50);
+      Fill("m(bb),b", boostedJet.M(), btagEfficiency * xsection);
+      Fill("pt(bb),b", boostedJet.Pt(), btagEfficiency * xsection);
+      Fill("m(llbb),b", (boostedJet + dilepton).M(), btagEfficiency * xsection);
+      Fill("deltaR(h,z),b", boostedJet.DeltaR(dilepton), btagEfficiency * xsection);
+      Fill("deltaPhi(h,z),b", boostedJet.DeltaPhi(dilepton), btagEfficiency * xsection);
+      Fill("pt(llbb),b", (boostedJet+dilepton).Pt(), btagEfficiency * xsection);
     }
-    
-    Fill("Flow Cut", 30);
-  } else {     
+  } else {
+    Fill("Flow Cut, r", 30);
     rjet1.SetXYZT((*mt->jets_antikt_4_x)[0], (*mt->jets_antikt_4_y)[0], (*mt->jets_antikt_4_z)[0], (*mt->jets_antikt_4_t)[0]);
     rjet2.SetXYZT((*mt->jets_antikt_4_x)[1], (*mt->jets_antikt_4_y)[1], (*mt->jets_antikt_4_z)[1], (*mt->jets_antikt_4_t)[1]);
     TLorentzVector dijet = rjet2 + rjet1;
@@ -132,15 +139,24 @@ void CHiggsHist::ProcessEvent() {
       return;
     }
 
-    Fill("Flow Cut", 40);
-    Fill("Flow Cut", 50);
-    Fill("m(bb),r", dijet.M());
-    Fill("m(llbb),r", (dijet + dilepton).M());
-    Fill("deltaR(h,z),r", dijet.DeltaR(dilepton));
-    Fill("deltaPhi(h,z),r", dijet.DeltaPhi(dilepton));
-    Fill("pt(llbb),r", (dijet+dilepton).Pt());
-    Fill("pt(bb),r", dijet.Pt());
+    Fill("Flow Cut, r", 40);
+    Fill("m(bb),r", dijet.M(), btagEfficiency * btagEfficiency * xsection);
+    Fill("m(llbb),r", (dijet + dilepton).M(), btagEfficiency * btagEfficiency * xsection);
+    Fill("deltaR(h,z),r", dijet.DeltaR(dilepton), btagEfficiency * btagEfficiency * xsection);
+    Fill("deltaPhi(h,z),r", dijet.DeltaPhi(dilepton), btagEfficiency * btagEfficiency * xsection);
+    Fill("pt(llbb),r", (dijet+dilepton).Pt(), btagEfficiency * btagEfficiency * xsection);
+    Fill("pt(bb),r", dijet.Pt(), btagEfficiency * btagEfficiency * xsection);
   }
+}
+
+void
+CHiggsHist::ProcessHistograms() {
+  CAnalysisData::ProcessHistograms();
+  for (auto& entry : histograms) {
+    entry.second->Scale(20000.0/(double)eventCount);
+  }
+
+  std::cout << eventCount << " events processed." << std::endl;
 }
 
 void HiggsHist(const char* inputFolder, std::vector<const char*>& inputFiles, std::vector<double>& crossSections, const char* outputFolder) {
@@ -171,3 +187,4 @@ void HiggsHist(const char* inputFolder, const char* inputFile, const char* outpu
   hh.IterateOverEvents();
   hh.SaveResults();
 }
+
