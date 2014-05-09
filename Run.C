@@ -129,7 +129,7 @@ void Run() {
   //RunBackground06();
   //RunHeavyHiggsExtraCuts10();
   //RunHeavyHiggsExtraCuts06();
-  //RunHeavyHiggs("", 1.0);
+  RunHeavyHiggs("", 1.0);
   RunBackground();
   //RunHeavyHiggs10();
   //RunTruth();

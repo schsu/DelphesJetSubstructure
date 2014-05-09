@@ -138,12 +138,12 @@ CJetSubstructure::StoreJets(vector<BaseParticle*>& jets, CFourVectorBranch* pfv,
 	    qjfdata->AddEntry(0.0, 0.0, 0.0, 0.0, 0.0);
 	  } else {
 	    std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
-	    //QJetsGeneric<QjetsPlugin>((Jet*)jets[0]->underlying());
+	    QJetsGeneric<QjetsPlugin>((Jet*)jets[0]->underlying());
 	    std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
 	    std::chrono::duration<double> totalTime = std::chrono::duration_cast<std::chrono::duration<double>>(end-start);
 	    double oldTime = totalTime.count();
 	    Fill("OldQJets (s)", totalTime.count());
-	    //qjdata->AddEntry(qj_m, qj_m2, qj_mAverage, qj_mRMS, qj_mRMSS);
+	    qjdata->AddEntry(qj_m, qj_m2, qj_mAverage, qj_mRMS, qj_mRMSS);
 
 	    start = std::chrono::high_resolution_clock::now();
 	    QJetsGeneric<fastqjets::QjetsPlugin>((Jet*)jets[0]->underlying());
