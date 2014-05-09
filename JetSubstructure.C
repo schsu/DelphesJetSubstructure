@@ -43,7 +43,8 @@ CJetSubstructure::CJetSubstructure() {
   jetMaxEta = 2.5;
 
   ptree = NULL;
-  pleptons = NULL;
+  pmuons = NULL;
+  pelectrons = NULL;
   pjets_4 = NULL;
   pjets_6 = NULL;
   pjets_10 = NULL;
@@ -55,7 +56,7 @@ CJetSubstructure::CJetSubstructure() {
   btags_4 = NULL;
   btags_6 = NULL;
   btags_10 = NULL;
-  
+
   counter = 0;
 }
 
@@ -81,6 +82,7 @@ CJetSubstructure::ProcessEvent() {
   // Select good muons and electrons (meeting the minPt/maxEta restrictions)
   for (int i = 0; i < branchElectron->GetEntries(); ++i) {
     BaseParticle* electron = GetElectron(i);
+    pelectrons->AddEntry(electron->P4());
     if (electron->PT() > electronMinPt && fabs(electron->Eta()) < electronMaxEta) {
       goodElectrons.push_back(electron);
     }
@@ -88,19 +90,10 @@ CJetSubstructure::ProcessEvent() {
 
   for (int i = 0; i < branchMuon->GetEntries(); ++i) {
     BaseParticle* muon = GetMuon(i);
+    pmuons->AddEntry(muon->P4());
     if (muon->PT() > muonMinPt && fabs(muon->Eta()) < muonMaxEta) {
       goodMuons.push_back(muon);
     }
-  }
-
-  // Find a dileption - in this case we care about a pair of electrons or a pair of muons
-  std::vector<BaseParticle*> dilepton;
-  if (goodElectrons.size() == 2 && goodMuons.size() == 0) {
-    dilepton.push_back(goodElectrons[0]);
-    dilepton.push_back(goodElectrons[1]);
-  } else if (goodElectrons.size() == 0 && goodMuons.size() == 2) {
-    dilepton.push_back(goodMuons[0]);
-    dilepton.push_back(goodMuons[1]);
   }
 
   // Select good jets - different from electrons
@@ -108,19 +101,11 @@ CJetSubstructure::ProcessEvent() {
   SelectGoodJets(goodJets6, branchJet6, goodElectrons);
   SelectGoodJets(goodJets10, branchJet10, goodElectrons);
 
-  // If we have enough jets, lets store everything for further analysis
-  if (goodJets4.size() >= 2 || goodJets6.size() >= 1 || goodJets10.size() >= 1) {
-    StoreJets(goodJets4, pjets_4, ptaus_4, btags_4, false);
-    StoreJets(goodJets6, pjets_6, ptaus_6, btags_6, false);
-    StoreJets(goodJets10, pjets_10, ptaus_10, btags_10, true);
+  StoreJets(goodJets4, pjets_4, ptaus_4, btags_4, false);
+  StoreJets(goodJets6, pjets_6, ptaus_6, btags_6, false);
+  StoreJets(goodJets10, pjets_10, ptaus_10, btags_10, true);
 
-    if (dilepton.size() == 2) {
-      pleptons->AddEntry(dilepton[0]->P4());
-      pleptons->AddEntry(dilepton[1]->P4());
-    }
-    
-    ptree->Fill();
-  }
+  ptree->Fill();
 }
 
 void 
@@ -190,9 +175,6 @@ CJetSubstructure::Initialize(const char* inputFolder, const char* inputFile, dou
 
 	ptree = new TTree("DelphesNTup", "DelphesNTup");
 	// Create the branches
-	pleptons = new CFourVectorBranch("leptons");
-	pleptons->AttachToTree(ptree);
-
 	pjets_4 = new CFourVectorBranch("jets_antikt_4");
 	pjets_4->AttachToTree(ptree);
 
@@ -225,6 +207,12 @@ CJetSubstructure::Initialize(const char* inputFolder, const char* inputFile, dou
 
 	btags_10 = new SimpleScalarBranch<int>("btags10");
 	btags_10->AttachToTree(ptree);
+	
+	pmuons = new CFourVectorBranch("muons");
+	pmuons->AttachToTree(ptree);
+
+	pelectrons = new CFourVectorBranch("electrons");
+	pelectrons->AttachToTree(ptree);
 }
 
 void
@@ -234,10 +222,11 @@ CJetSubstructure::SaveResults() {
 
 void
 CJetSubstructure::Reset() {
-	pleptons->Reset();
 	pjets_4->Reset();
 	pjets_6->Reset();
 	pjets_10->Reset();
+	pelectrons->Reset();
+	pmuons->Reset();
 	ptaus_4->Reset();
 	ptaus_6->Reset();
 	ptaus_10->Reset();

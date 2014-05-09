@@ -63,23 +63,32 @@ void RunHeavyHiggs(TString coneSize, float fcs) {
 }
 
 void RunBackground() {
-  TString baseName = "back-triple-";
+  TString baseName = "back-large-triple-";
   TString masses[] = {
-    "1GeV",
-    "2GeV",
-    "3GeV",
-    "4GeV",
-    "5GeV",
-    "6GeV",
-    "7GeV",
-    "8GeV",
+    "101",
+    "102",
+    "103",
+    "104",
+    "105",
+    "106",
+    "107",
+    "108",
+    "110",
+    "111",
+    "112",
+    "113",
+    "114",
+    "115",
+    "116",
+    "117"
   };
 
   for (int i = 0; i < sizeof(masses)/sizeof(masses[0]); ++i) {
     TString inputFile = baseName + masses[i] + ".root";
     std::vector<std::string> params;
     params.push_back(std::string((const char*)inputFile));
-    exec_cmd_no_wait("./ha", params);
+    RunHeavyHiggsThread(inputFile);
+    //exec_cmd_no_wait("./ha", params);
   }
 }
 

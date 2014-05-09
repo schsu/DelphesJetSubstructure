@@ -10,6 +10,14 @@
 
 using namespace std;
 
+class GlobalData {
+public:
+  std::map<double, double> resolvedYield;
+  std::map<double, double> boostedYield;
+  GlobalData();
+  ~GlobalData();
+};
+
 class back_entry {
 public:
   TString file;
@@ -201,5 +209,7 @@ public:
   vector<t> *values;
   string name;
 };
+
+extern GlobalData gd;
 
 #endif // _HELPERCLASSES_H
