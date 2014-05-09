@@ -24,10 +24,11 @@ private:
 	double qj_mRMSS;
 	double qj_mRMS;
 
-	CFourVectorBranch *pleptons;
 	CFourVectorBranch *pjets_4;
 	CFourVectorBranch *pjets_6;
 	CFourVectorBranch *pjets_10;
+	CFourVectorBranch *pmuons;
+	CFourVectorBranch *pelectrons;
 	CTaus *ptaus_4;
 	CTaus *ptaus_6;
 	CTaus *ptaus_10;
@@ -36,7 +37,6 @@ private:
 	SimpleScalarBranch<int> *btags_4;
 	SimpleScalarBranch<int> *btags_6;
 	SimpleScalarBranch<int> *btags_10;
-	SimpleScalarBranch<int> *leptonType;
 
 	TTree* ptree;
 public:
