@@ -55,7 +55,8 @@ CJetSubstructure::CJetSubstructure() {
   btags_4 = NULL;
   btags_6 = NULL;
   btags_10 = NULL;
-  
+  leptonType = NULL;
+
   counter = 0;
 }
 
@@ -117,6 +118,11 @@ CJetSubstructure::ProcessEvent() {
     if (dilepton.size() == 2) {
       pleptons->AddEntry(dilepton[0]->P4());
       pleptons->AddEntry(dilepton[1]->P4());
+      if (goodElectrons.size() > 0) {
+	leptonType->AddEntry(1);
+      } else {
+	leptonType->AddEntry(2);
+      }
     }
     
     ptree->Fill();
@@ -225,6 +231,9 @@ CJetSubstructure::Initialize(const char* inputFolder, const char* inputFile, dou
 
 	btags_10 = new SimpleScalarBranch<int>("btags10");
 	btags_10->AttachToTree(ptree);
+
+	leptonType = new SimpleScalarBranch<int>("leptonType");
+	leptonType->AttachToTree(ptree);
 }
 
 void
@@ -246,6 +255,7 @@ CJetSubstructure::Reset() {
 	btags_4->Reset();
 	btags_6->Reset();
 	btags_10->Reset();
+	leptonType->Reset();
 }
 
 double

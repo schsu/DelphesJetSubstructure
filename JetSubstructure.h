@@ -36,6 +36,7 @@ private:
 	SimpleScalarBranch<int> *btags_4;
 	SimpleScalarBranch<int> *btags_6;
 	SimpleScalarBranch<int> *btags_10;
+	SimpleScalarBranch<int> *leptonType;
 
 	TTree* ptree;
 public:

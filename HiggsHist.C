@@ -29,6 +29,9 @@ private:
   int eventCount;
 
 public:
+  double fullEventCount;
+  double amass;
+  
   CHiggsHist();
   ~CHiggsHist();
   void Initialize(const char* inputFolder, const char* inputFile, const char* outputFolder, double xs);
@@ -36,6 +39,7 @@ public:
   void IterateOverEvents();
   void ProcessEvent();
   void ProcessHistograms();
+  void DisplayFlow(const std::string& name, TH1F* hist);
 };
 
 CHiggsHist::CHiggsHist() {
@@ -107,12 +111,17 @@ void CHiggsHist::ProcessEvent() {
   TLorentzVector boostedJet;
   TLorentzVector rjet1, rjet2;
   Fill("btag4", (double)(*mt->btags10)[0]);
+  bool resolveAt4 = mt->jets_antikt_4_x->size() >= 2 && ((*mt->btags4)[0] & 2) != 0 && ((*mt->btags4)[1] & 2) != 0;
+  bool resolveAt6 = mt->jets_antikt_6_x->size() >= 2 && ((*mt->btags6)[0] & 2) != 0 && ((*mt->btags6)[1] & 2) != 0;
   // If we are dealing with boosted jets
-  if (mt->jets_antikt_4_x->size() < 2 || ((*mt->btags4)[0] & 2) == 0 || ((*mt->btags4)[1] & 2) == 0) {
+  if (!resolveAt4 && !resolveAt6) {
     // have at least one boosted jet
     Fill("Flow Cut, b", 30);
     if (mt->jets_antikt_10_x->size() > 0 && ((*mt->btags10)[0] & 2) != 0) {
       boostedJet.SetXYZT((*mt->jets_antikt_10_x)[0], (*mt->jets_antikt_10_y)[0], (*mt->jets_antikt_10_z)[0], (*mt->jets_antikt_10_t)[0]);
+      Fill("m(bb),b, no H cut", boostedJet.M(), btagEfficiency * xsection);
+      Fill("pt(bb),b, no H cut", boostedJet.Pt(), btagEfficiency * xsection);
+
       if (boostedJet.M() < 85.0 || boostedJet.M() > 165.0) {
 	return;
       }
@@ -132,8 +141,14 @@ void CHiggsHist::ProcessEvent() {
     }
   } else {
     Fill("Flow Cut, r", 30);
-    rjet1.SetXYZT((*mt->jets_antikt_4_x)[0], (*mt->jets_antikt_4_y)[0], (*mt->jets_antikt_4_z)[0], (*mt->jets_antikt_4_t)[0]);
-    rjet2.SetXYZT((*mt->jets_antikt_4_x)[1], (*mt->jets_antikt_4_y)[1], (*mt->jets_antikt_4_z)[1], (*mt->jets_antikt_4_t)[1]);
+    if (resolveAt4) {
+      rjet1.SetXYZT((*mt->jets_antikt_4_x)[0], (*mt->jets_antikt_4_y)[0], (*mt->jets_antikt_4_z)[0], (*mt->jets_antikt_4_t)[0]);
+      rjet2.SetXYZT((*mt->jets_antikt_4_x)[1], (*mt->jets_antikt_4_y)[1], (*mt->jets_antikt_4_z)[1], (*mt->jets_antikt_4_t)[1]);
+    } else if (resolveAt6) {
+      rjet1.SetXYZT((*mt->jets_antikt_6_x)[0], (*mt->jets_antikt_6_y)[0], (*mt->jets_antikt_6_z)[0], (*mt->jets_antikt_6_t)[0]);
+      rjet2.SetXYZT((*mt->jets_antikt_6_x)[1], (*mt->jets_antikt_6_y)[1], (*mt->jets_antikt_6_z)[1], (*mt->jets_antikt_6_t)[1]);
+    }
+
     TLorentzVector dijet = rjet2 + rjet1;
     if (dijet.M() < 85.0 || dijet.M() > 165.0) {
       return;
@@ -150,16 +165,42 @@ void CHiggsHist::ProcessEvent() {
 }
 
 void
+CHiggsHist::DisplayFlow(const std::string& name, TH1F* hist) {
+  std::cout << "Flow " << name << std::endl;
+  int nbins = hist->GetNbinsX();
+  for (int i = 1; i <= nbins; ++i) {
+    double items = hist->GetBinContent(i);
+    if (items > 0.0) {
+      std::cout << items << " ";
+    }
+  }
+
+  std::cout << std::endl;
+}
+
+void
 CHiggsHist::ProcessHistograms() {
   CAnalysisData::ProcessHistograms();
   for (auto& entry : histograms) {
-    entry.second->Scale(20000.0/(double)eventCount);
+    if (entry.first == "Flow Cut, r") {
+      DisplayFlow("Resolved channel", entry.second);
+    } else if (entry.first == "Flow Cut, b") {
+      DisplayFlow("Boosted channel", entry.second);
+    }
+    
+    entry.second->Scale(20000.0/(double)fullEventCount);
+  
+    if (entry.first == "pt(llbb),r") {
+      gd.resolvedYield[amass] = entry.second->Integral();
+    } else if (entry.first == "pt(llbb),b") {
+      gd.boostedYield[amass] = entry.second->Integral();
+    }
   }
 
   std::cout << eventCount << " events processed." << std::endl;
 }
 
-void HiggsHist(const char* inputFolder, std::vector<const char*>& inputFiles, std::vector<double>& crossSections, const char* outputFolder) {
+void HiggsHist(const char* inputFolder, std::vector<const char*>& inputFiles, std::vector<double>& crossSections, const char* outputFolder, double mass, double eventCountPerFile) {
   CHiggsHist hh;
   if (inputFiles.size() != crossSections.size()) {
     std::cout << "Input files number and cross sections number have to match!" << std::endl;
@@ -169,10 +210,13 @@ void HiggsHist(const char* inputFolder, std::vector<const char*>& inputFiles, st
   std::vector<const char*>::iterator i = inputFiles.begin();
   std::vector<double>::iterator ixs = crossSections.begin();
   hh.ReInitialize(inputFolder, *i, *ixs);
+  hh.amass = mass;
+  hh.fullEventCount = eventCountPerFile;
   hh.IterateOverEvents();
   
   while (++i != inputFiles.end()) {
     ++ixs;
+    hh.fullEventCount += eventCountPerFile;
     hh.ReInitialize(inputFolder, *i, *ixs);
     hh.IterateOverEvents();
   }
@@ -181,9 +225,11 @@ void HiggsHist(const char* inputFolder, std::vector<const char*>& inputFiles, st
   hh.SaveResults();
 }
 
-void HiggsHist(const char* inputFolder, const char* inputFile, const char* outputFolder) {
+void HiggsHist(const char* inputFolder, const char* inputFile, const char* outputFolder, double xsection, double mass, double eventCount) {
   CHiggsHist hh;
-  hh.Initialize(inputFolder, inputFile, outputFolder, 1.0);
+  hh.Initialize(inputFolder, inputFile, outputFolder, xsection);
+  hh.fullEventCount = eventCount;
+  hh.amass = mass;
   hh.IterateOverEvents();
   hh.SaveResults();
 }

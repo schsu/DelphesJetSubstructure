@@ -22,6 +22,8 @@
 
 using namespace std;
 
+GlobalData gd;
+
 void CAnalysisData::ProcessEvent() {
 }
 
@@ -211,7 +213,7 @@ void CAnalysisData::Process1DHistograms() {
     }
 
     float average = std::accumulate(it->second.begin(), it->second.end(), 0.0) / (it->second.size() > 0 ? it->second.size() : 1);
-    std::cout << it->first.c_str() << " " << maxHistVal << " " << minHistVal << " " << average << std::endl;
+    std::cout << it->first.c_str() << " " << maxHistVal << " " << minHistVal << " " << average << " " << " n=" << it->second.size() << std::endl;
 
     float expansionFactor = 0.1;
     if (useFixedValues) {
@@ -428,4 +430,19 @@ QJetsData::Reset() {
   pavg->clear();
   prms->clear();
   prmss->clear();
+}
+
+GlobalData::GlobalData() {
+}
+
+GlobalData::~GlobalData() {
+  std::cout << "Resolved yields:" << std::endl;
+  for (const std::pair<double, double>& p : resolvedYield) {
+    std::cout << p.first << "->" << p.second << std::endl;
+  }
+
+  std::cout << "Boosted yields:" << std::endl;
+  for (const std::pair<double, double>& p : boostedYield) {
+    std::cout << p.first << "->" << p.second << std::endl;
+  }
 }
