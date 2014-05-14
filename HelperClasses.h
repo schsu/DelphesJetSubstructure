@@ -13,7 +13,8 @@ using namespace std;
 class GlobalData {
 public:
   std::map<double, double> resolvedYield;
-  std::map<double, double> boostedYield;
+  std::map<double, double> boostedLowYield;
+  std::map<double, double> boostedHighYield;
   GlobalData();
   ~GlobalData();
 };

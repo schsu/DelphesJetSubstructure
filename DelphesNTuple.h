@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Tue Apr 29 13:58:33 2014 by ROOT version 5.34/18
+// Sun May 11 17:17:21 2014 by ROOT version 5.34/18
 // from TTree DelphesNTup/DelphesNTup
-// found on file: /Research/outputs/mintree_jetsub_a-zh-triple-400GeV.root
+// found on file: mintree_jetsub_a-zh-triple-1000GeV.root
 //////////////////////////////////////////////////////////
 
 #ifndef DelphesNTuple_h
@@ -14,7 +14,6 @@
 
 // Header file for the classes stored in the TTree if any.
 #include <vector>
-#include <vector>
 using namespace std;
 // Fixed size dimensions of array or collections stored in the TTree if any.
 
@@ -24,10 +23,6 @@ public :
    Int_t           fCurrent; //!current Tree number in a TChain
 
    // Declaration of leaf types
-   vector<double>  *leptons_x;
-   vector<double>  *leptons_y;
-   vector<double>  *leptons_z;
-   vector<double>  *leptons_t;
    vector<double>  *jets_antikt_4_x;
    vector<double>  *jets_antikt_4_y;
    vector<double>  *jets_antikt_4_z;
@@ -62,12 +57,16 @@ public :
    vector<int>     *btags4;
    vector<int>     *btags6;
    vector<int>     *btags10;
+   vector<double>  *muons_x;
+   vector<double>  *muons_y;
+   vector<double>  *muons_z;
+   vector<double>  *muons_t;
+   vector<double>  *electrons_x;
+   vector<double>  *electrons_y;
+   vector<double>  *electrons_z;
+   vector<double>  *electrons_t;
 
    // List of branches
-   TBranch        *b_leptons_x;   //!
-   TBranch        *b_leptons_y;   //!
-   TBranch        *b_leptons_z;   //!
-   TBranch        *b_leptons_t;   //!
    TBranch        *b_jets_antikt_4_x;   //!
    TBranch        *b_jets_antikt_4_y;   //!
    TBranch        *b_jets_antikt_4_z;   //!
@@ -102,6 +101,14 @@ public :
    TBranch        *b_btags4;   //!
    TBranch        *b_btags6;   //!
    TBranch        *b_btags10;   //!
+   TBranch        *b_muons_x;   //!
+   TBranch        *b_muons_y;   //!
+   TBranch        *b_muons_z;   //!
+   TBranch        *b_muons_t;   //!
+   TBranch        *b_electrons_x;   //!
+   TBranch        *b_electrons_y;   //!
+   TBranch        *b_electrons_z;   //!
+   TBranch        *b_electrons_t;   //!
 
    DelphesNTuple(TTree *tree=0);
    virtual ~DelphesNTuple();
@@ -122,9 +129,9 @@ DelphesNTuple::DelphesNTuple(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/Research/outputs/mintree_jetsub_a-zh-triple-400GeV.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("mintree_jetsub_a-zh-triple-1000GeV.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("/Research/outputs/mintree_jetsub_a-zh-triple-400GeV.root");
+         f = new TFile("mintree_jetsub_a-zh-triple-1000GeV.root");
       }
       f->GetObject("DelphesNTup",tree);
 
@@ -168,10 +175,6 @@ void DelphesNTuple::Init(TTree *tree)
    // (once per file to be processed).
 
    // Set object pointer
-   leptons_x = 0;
-   leptons_y = 0;
-   leptons_z = 0;
-   leptons_t = 0;
    jets_antikt_4_x = 0;
    jets_antikt_4_y = 0;
    jets_antikt_4_z = 0;
@@ -206,16 +209,20 @@ void DelphesNTuple::Init(TTree *tree)
    btags4 = 0;
    btags6 = 0;
    btags10 = 0;
+   muons_x = 0;
+   muons_y = 0;
+   muons_z = 0;
+   muons_t = 0;
+   electrons_x = 0;
+   electrons_y = 0;
+   electrons_z = 0;
+   electrons_t = 0;
    // Set branch addresses and branch pointers
    if (!tree) return;
    fChain = tree;
    fCurrent = -1;
    fChain->SetMakeClass(1);
 
-   fChain->SetBranchAddress("leptons_x", &leptons_x, &b_leptons_x);
-   fChain->SetBranchAddress("leptons_y", &leptons_y, &b_leptons_y);
-   fChain->SetBranchAddress("leptons_z", &leptons_z, &b_leptons_z);
-   fChain->SetBranchAddress("leptons_t", &leptons_t, &b_leptons_t);
    fChain->SetBranchAddress("jets_antikt_4_x", &jets_antikt_4_x, &b_jets_antikt_4_x);
    fChain->SetBranchAddress("jets_antikt_4_y", &jets_antikt_4_y, &b_jets_antikt_4_y);
    fChain->SetBranchAddress("jets_antikt_4_z", &jets_antikt_4_z, &b_jets_antikt_4_z);
@@ -250,6 +257,14 @@ void DelphesNTuple::Init(TTree *tree)
    fChain->SetBranchAddress("btags4", &btags4, &b_btags4);
    fChain->SetBranchAddress("btags6", &btags6, &b_btags6);
    fChain->SetBranchAddress("btags10", &btags10, &b_btags10);
+   fChain->SetBranchAddress("muons_x", &muons_x, &b_muons_x);
+   fChain->SetBranchAddress("muons_y", &muons_y, &b_muons_y);
+   fChain->SetBranchAddress("muons_z", &muons_z, &b_muons_z);
+   fChain->SetBranchAddress("muons_t", &muons_t, &b_muons_t);
+   fChain->SetBranchAddress("electrons_x", &electrons_x, &b_electrons_x);
+   fChain->SetBranchAddress("electrons_y", &electrons_y, &b_electrons_y);
+   fChain->SetBranchAddress("electrons_z", &electrons_z, &b_electrons_z);
+   fChain->SetBranchAddress("electrons_t", &electrons_t, &b_electrons_t);
    Notify();
 }
 

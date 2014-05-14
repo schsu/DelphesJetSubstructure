@@ -12,20 +12,23 @@ void
 AnalyzeBackground() {
   std::vector<const char*> filenames;
   std::vector<double> xsections;
-  for (int i = 1; i <= 8; ++i) {
-    char buffer[2048];
-    sprintf(buffer, "mintree_jetsub_back-triple-%dGeV.root", i);
-    filenames.push_back(strdup(buffer));
-  }
+  for (int j = 0; j < 5; ++j) {
+    for (int i = 1; i <= 8; ++i) {
+      char buffer[2048];
+      sprintf(buffer, "mintree_jetsub_background-%d.root", 100 + j*9 + i);
+      filenames.push_back(strdup(buffer));
+    }
 
-  xsections.push_back(14.59);
-  xsections.push_back(0.7155);
-  xsections.push_back(0.0668);
-  xsections.push_back(0.01246);
-  xsections.push_back(0.003444);
-  xsections.push_back(0.001215);
-  xsections.push_back(0.0007277);
-  xsections.push_back(0.0001713);
+    xsections.push_back(14.59);
+    xsections.push_back(0.7155);
+    xsections.push_back(0.0668);
+    xsections.push_back(0.01246);
+    xsections.push_back(0.003444);
+    xsections.push_back(0.001215);
+    xsections.push_back(0.0007277);
+    xsections.push_back(0.0001713);
+  }
+  
   HiggsHist(inputFolder, filenames, xsections, outputFolder, 1, 50000);
   std::cout << "Done with background" << std::endl;
 }
@@ -58,11 +61,12 @@ int main(int argc, char* argv[]) {
   AnalyzeSignalForAllMasses();
   AnalyzeBackground();
 
-  TFile* yieldsFile = new TFile(outputFolder + "yeilds.root", "recreate");
-  PlotYields("resolved", gd.resolvedYield);
-  PlotYields("boosted", gd.boostedYield);
-  yieldsFile->Write();
-  yieldsFile->Close();
+  //  TFile* yieldsFile = new TFile(outputFolder + "yeilds.root", "recreate");
+  //PlotYields("resolved", gd.resolvedYield);
+  //PlotYields("boosted low", gd.boostedLowYield);
+  //PlotYields("boosted high", gd.boostedHighYield);
+  //yieldsFile->Write();
+  //yieldsFile->Close();
 
   return 0;
 }
