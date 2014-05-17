@@ -3,10 +3,13 @@
 #include <vector>
 #include <map>
 
+#include <TCanvas.h>
+
 #include "DelphesNTuple.h"
 #include "LocalSettings.h"
 #include "HiggsHist.h"
 #include "HelperClasses.h"
+#include "AtlasStyle.h"
 
 void
 AnalyzeBackground() {
@@ -51,17 +54,33 @@ PlotYields(const std::string& name, std::map<double, double> yields) {
   double miny = std::min_element(yields.begin(), yields.end(), [](std::pair<double, double> p, std::pair<double, double> q) { return p.second < q.second; })->second;
   double maxy = std::max_element(yields.begin(), yields.end(), [](std::pair<double, double> p, std::pair<double, double> q) { return p.second < q.second; })->second;
 
+  std::string canvasName = "Yields " + name;
+  TCanvas * c = new TCanvas(canvasName.c_str(), canvasName.c_str(), 900, 700);
+  SetAtlasStyle();
+  c->SetLogy();
+
   TH2F* hist = new TH2F(name.c_str(), name.c_str(), 100, 0, 1000, 100, miny * 0.9, maxy * 1.1);
   for (const std::pair<double, double>& p : yields) {
+    // don't plot background yields
+    if (p.first < 100) {
+      continue;
+    }
+    hist->SetMarkerStyle(21);
+    hist->SetMarkerColor(kBlue);
     hist->Fill(p.first, p.second);
+    hist->Draw();
   }
+  
+  c->Print(outputFolder + "yields.pdf");
 }
 
-int main(int argc, char* argv[]) {
-  AnalyzeSignalForAllMasses();
-  AnalyzeBackground();
+void
+PlotYields() {
+  TFile* yieldsFile = new TFile(outputFolder + "yields.root", "recreate");
+  // Start the pdf file
+  TCanvas * c = new TCanvas("Yields", "Yields", 900, 700);
+  c->Print(outputFolder + "yields.pdf[");
 
-  TFile* yieldsFile = new TFile(outputFolder + "yeilds.root", "recreate");
   PlotYields("resolved", gd.resolvedYield);
   PlotYields("boosted 0.8", gd.boostedLowYield);
   PlotYields("boosted 1.2", gd.boostedHighYield);
@@ -74,8 +93,18 @@ int main(int argc, char* argv[]) {
 
   PlotYields("resolved+boosted 0.8", rbLow);
   PlotYields("resolved+boosted 1.2", rbHigh);
+  
+  // Finish the pdf file
+  TCanvas * c2 = new TCanvas("Yields", "Yields", 900, 700);
+  c2->Print(outputFolder + "yields.pdf]");
   yieldsFile->Write();
   yieldsFile->Close();
+}
+
+int main(int argc, char* argv[]) {
+  AnalyzeSignalForAllMasses();
+  AnalyzeBackground();
+  PlotYields();
 
   return 0;
 }

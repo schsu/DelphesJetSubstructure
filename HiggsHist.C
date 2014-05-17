@@ -200,7 +200,7 @@ void CHiggsHist::ProcessEvent() {
   jetsMid = SelectGoodJets(jetsMid, goodElectrons);
   jetsHigh = SelectGoodJets(jetsHigh, goodElectrons);
 
-  int btagFlag = 1;
+  int btagFlag = 2;
 
   if (jetsLow.size() >= 2) {
     Fill("Flow Cut", 40);
@@ -211,12 +211,12 @@ void CHiggsHist::ProcessEvent() {
       TLorentzVector dijet = jetsLow[0].first + jetsLow[1].first;
       if (dijet.M() > 126.0-15.0 && dijet.M() < 126.0+15.0) {
 	Fill("Flow Cut", 60);
-	Fill("m(ll),r", dileptonMass, xsection);
-	Fill("pT(ll),r", dileptonPt, xsection);
-	Fill("m(bb),r", dijet.M(), xsection);
-	Fill("pT(bb),r", dijet.Pt(), xsection);
-	Fill("m(llbb),r", (dijet+dilepton[0]+dilepton[1]).M(), xsection);
-	Fill("pT(llbb),r", (dijet+dilepton[0]+dilepton[1]).Pt(), xsection);
+	Fill("m(ll),r", dileptonMass, xsection * btagEfficiency * btagEfficiency);
+	Fill("pT(ll),r", dileptonPt, xsection * btagEfficiency * btagEfficiency);
+	Fill("m(bb),r", dijet.M(), xsection * btagEfficiency * btagEfficiency);
+	Fill("pT(bb),r", dijet.Pt(), xsection * btagEfficiency * btagEfficiency);
+	Fill("m(llbb),r", (dijet+dilepton[0]+dilepton[1]).M(), xsection * btagEfficiency * btagEfficiency);
+	Fill("pT(llbb),r", (dijet+dilepton[0]+dilepton[1]).Pt(), xsection * btagEfficiency * btagEfficiency);
 	resolved = true;
       }
     }
@@ -234,12 +234,12 @@ void CHiggsHist::ProcessEvent() {
 	Fill("Flow Cut", 90);
 	if (jetFilterBTag[0].first.M() > 106.0 && jetFilterBTag[0].first.M() < 146.0) {
 	  Fill("Flow Cut", 100);
-	  Fill("m(ll),bl", dileptonMass, xsection);
-	  Fill("pT(ll),bl", dileptonPt, xsection);
-	  Fill("m(bb),bl", jetFilterBTag[0].first.M(), xsection);
-	  Fill("pT(bb),bl", jetFilterBTag[0].first.Pt(), xsection);
-	  Fill("m(llbb),bl", (jetFilterBTag[0].first+dilepton[0]+dilepton[1]).M(), xsection);
-	  Fill("pT(llbb),bl", (jetFilterBTag[0].first+dilepton[0]+dilepton[1]).Pt(), xsection);
+	  Fill("m(ll),bl", dileptonMass, xsection * btagEfficiency);
+	  Fill("pT(ll),bl", dileptonPt, xsection * btagEfficiency);
+	  Fill("m(bb),bl", jetFilterBTag[0].first.M(), xsection * btagEfficiency);
+	  Fill("pT(bb),bl", jetFilterBTag[0].first.Pt(), xsection * btagEfficiency);
+	  Fill("m(llbb),bl", (jetFilterBTag[0].first+dilepton[0]+dilepton[1]).M(), xsection * btagEfficiency);
+	  Fill("pT(llbb),bl", (jetFilterBTag[0].first+dilepton[0]+dilepton[1]).Pt(), xsection * btagEfficiency);
 	}
       }
     }
@@ -257,10 +257,10 @@ void CHiggsHist::ProcessEvent() {
 	Fill("Flow Cut", 130);
 	if (jetFilterBTag[0].first.M() > 106.0 && jetFilterBTag[0].first.M() < 146.0) {
 	  Fill("Flow Cut", 140);
-	  Fill("m(ll),bh", dileptonMass, xsection);
-	  Fill("pT(ll),bh", dileptonPt, xsection);
-	  Fill("m(bb),bh", jetFilterBTag[0].first.M(), xsection);
-	  Fill("pT(bb),bh", jetFilterBTag[0].first.Pt(), xsection);
+	  Fill("m(ll),bh", dileptonMass, xsection * btagEfficiency);
+	  Fill("pT(ll),bh", dileptonPt, xsection * btagEfficiency);
+	  Fill("m(bb),bh", jetFilterBTag[0].first.M(), xsection * btagEfficiency);
+	  Fill("pT(bb),bh", jetFilterBTag[0].first.Pt(), xsection * btagEfficiency);
 	  Fill("m(llbb),bh", (jetFilterBTag[0].first+dilepton[0]+dilepton[1]).M(), xsection);
 	  Fill("pT(llbb),bh", (jetFilterBTag[0].first+dilepton[0]+dilepton[1]).Pt(), xsection);
 
