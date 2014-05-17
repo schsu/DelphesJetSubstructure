@@ -263,6 +263,21 @@ void CHiggsHist::ProcessEvent() {
 	  Fill("pT(bb),bh", jetFilterBTag[0].first.Pt(), xsection);
 	  Fill("m(llbb),bh", (jetFilterBTag[0].first+dilepton[0]+dilepton[1]).M(), xsection);
 	  Fill("pT(llbb),bh", (jetFilterBTag[0].first+dilepton[0]+dilepton[1]).Pt(), xsection);
+
+	  TLorentzVector a = jetFilterBTag[0].first + dilepton[0] + dilepton[1];
+	  Fill("pt vs mass", std::pair<float, float>(a.M(), a.Eta()));
+	  // Do some special processing for the unusual peak
+	  if ((jetFilterBTag[0].first+dilepton[0]+dilepton[1]).M() > 150 && (jetFilterBTag[0].first+dilepton[0]+dilepton[1]).M() < 400) {
+	    Fill("m(s)", (jetFilterBTag[0].first+dilepton[0]+dilepton[1]).M());
+	    Fill("pT(s)", (jetFilterBTag[0].first+dilepton[0]+dilepton[1]).Pt());
+	    Fill("eta(s)", (jetFilterBTag[0].first+dilepton[0]+dilepton[1]).Eta());
+	    Fill("phi(s)", (jetFilterBTag[0].first+dilepton[0]+dilepton[1]).Phi());
+	    Fill("m(sj)", jetFilterBTag[0].first.M());
+	    Fill("pt(sj)", jetFilterBTag[0].first.Pt());
+	    Fill("eta(sj)", jetFilterBTag[0].first.Eta());
+	    Fill("phi(sj)", jetFilterBTag[0].first.Phi());
+	    Fill("pt vs mass(s)", std::pair<float, float>(a.M(), a.Eta()));
+	  }
 	}
       }
     }
@@ -294,15 +309,13 @@ CHiggsHist::ProcessHistograms() {
     }
     
     entry.second->Scale(20000.0/(double)eventCount);
-  #if 0
-    if (entry.first == "pt(llbb),r") {
+    if (entry.first == "pT(llbb),r") {
       gd.resolvedYield[amass] = entry.second->Integral();
-    } else if (entry.first == "pt(llbb),bh") {
+    } else if (entry.first == "pT(llbb),bh") {
       gd.boostedHighYield[amass] = entry.second->Integral();
-    } else if (entry.first == "pt(llbb),bl") {
+    } else if (entry.first == "pT(llbb),bl") {
       gd.boostedLowYield[amass] = entry.second->Integral();
     }
-#endif
   }
 
   std::cout << eventCount << " events processed." << std::endl;

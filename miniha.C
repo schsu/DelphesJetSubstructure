@@ -39,7 +39,7 @@ AnalyzeSignalForAllMasses() {
   double xsections[] = { 0.405, 0.493, 0.0473, 0.0114, 0.00431, 0.00205, 0.00106, 0.000577, 0.000326, 0.000189 };
   for (int i = 0; i < sizeof(masses)/sizeof(masses[0]); ++i) {
     char fileName[1024];
-    sprintf(fileName, "mintree_jetsub_a-zh-triple-%dGeV.root", masses[i]);
+    sprintf(fileName, "mintree_jetsub_a-zh-%dGeV.root", masses[i]);
     HiggsHist(inputFolder, fileName, outputFolder, xsections[i], masses[i], 50000);
     std::cout << "Done with " << masses[i] << "GeV" << std::endl;
     std::cout.flush();
@@ -61,12 +61,21 @@ int main(int argc, char* argv[]) {
   AnalyzeSignalForAllMasses();
   AnalyzeBackground();
 
-  //  TFile* yieldsFile = new TFile(outputFolder + "yeilds.root", "recreate");
-  //PlotYields("resolved", gd.resolvedYield);
-  //PlotYields("boosted low", gd.boostedLowYield);
-  //PlotYields("boosted high", gd.boostedHighYield);
-  //yieldsFile->Write();
-  //yieldsFile->Close();
+  TFile* yieldsFile = new TFile(outputFolder + "yeilds.root", "recreate");
+  PlotYields("resolved", gd.resolvedYield);
+  PlotYields("boosted 0.8", gd.boostedLowYield);
+  PlotYields("boosted 1.2", gd.boostedHighYield);
+  std::map<double, double> rbLow;
+  std::map<double, double> rbHigh;
+  for (const std::pair<double, double>& p : gd.resolvedYield) {
+    rbLow[p.first] = p.second + gd.boostedLowYield[p.first];
+    rbHigh[p.first] = p.second + gd.boostedHighYield[p.first];
+  }
+
+  PlotYields("resolved+boosted 0.8", rbLow);
+  PlotYields("resolved+boosted 1.2", rbHigh);
+  yieldsFile->Write();
+  yieldsFile->Close();
 
   return 0;
 }

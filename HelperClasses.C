@@ -441,8 +441,13 @@ GlobalData::~GlobalData() {
     std::cout << p.first << "->" << p.second << std::endl;
   }
 
-  std::cout << "Boosted yields:" << std::endl;
-  for (const std::pair<double, double>& p : boostedYield) {
+  std::cout << "Boosted low yields:" << std::endl;
+  for (const std::pair<double, double>& p : boostedLowYield) {
+    std::cout << p.first << "->" << p.second << std::endl;
+  }
+
+  std::cout << "Boosted high yeilds: " << std::endl;
+  for (const std::pair<double, double>& p : boostedHighYield) {
     std::cout << p.first << "->" << p.second << std::endl;
   }
 }
