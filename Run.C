@@ -35,7 +35,7 @@ void RunHeavyHiggsThread(TString inputFile) {
 }
 
 void RunHeavyHiggs(TString coneSize, float fcs) {
-  TString baseName = "a-zh-triple-";
+  TString baseName = "a-zh-";
   TString masses[] = {
     "250GeV",
     "300GeV",
@@ -63,7 +63,7 @@ void RunHeavyHiggs(TString coneSize, float fcs) {
 }
 
 void RunBackground() {
-  TString baseName = "back-large-triple-";
+  TString baseName = "background-";
   TString masses[] = {
     "101",
     "102",
@@ -73,22 +73,17 @@ void RunBackground() {
     "106",
     "107",
     "108",
-    "110",
-    "111",
-    "112",
-    "113",
-    "114",
-    "115",
-    "116",
-    "117"
   };
 
-  for (int i = 0; i < sizeof(masses)/sizeof(masses[0]); ++i) {
-    TString inputFile = baseName + masses[i] + ".root";
-    std::vector<std::string> params;
-    params.push_back(std::string((const char*)inputFile));
-    RunHeavyHiggsThread(inputFile);
-    //exec_cmd_no_wait("./ha", params);
+  for (int i = 0; i < 5; ++i) {
+    for(int j = 0; j < 8; ++j) {
+      char buffer[2048];
+      sprintf(buffer, "%3d", 101+i*9+j);
+      TString inputFile = baseName + buffer + ".root";
+      std::vector<std::string> params;
+      params.push_back(std::string((const char*)inputFile));
+      exec_cmd_no_wait("./ha", params);
+    }
   }
 }
 
@@ -138,8 +133,8 @@ void Run() {
   //RunBackground06();
   //RunHeavyHiggsExtraCuts10();
   //RunHeavyHiggsExtraCuts06();
-  //RunHeavyHiggs("", 1.0);
-  RunBackground();
+  RunHeavyHiggs("", 1.0);
+  //RunBackground();
   //RunHeavyHiggs10();
   //RunTruth();
   //RunFullBackground();
