@@ -4,6 +4,8 @@
 #include <map>
 
 #include <TCanvas.h>
+#include <TPaveLabel.h>
+#include <TPaveText.h>
 
 #include "DelphesNTuple.h"
 #include "LocalSettings.h"
@@ -15,7 +17,7 @@ void
 AnalyzeBackground() {
   std::vector<const char*> filenames;
   std::vector<double> xsections;
-  for (int j = 0; j < 5; ++j) {
+  for (int j = 0; j < 1; ++j) {
     for (int i = 1; i <= 8; ++i) {
       char buffer[2048];
       sprintf(buffer, "mintree_jetsub_background-%d.root", 100 + j*9 + i);
@@ -59,18 +61,19 @@ PlotYields(const std::string& name, std::map<double, double> yields) {
   SetAtlasStyle();
   c->SetLogy();
 
-  TH2F* hist = new TH2F(name.c_str(), name.c_str(), 100, 0, 1000, 100, miny * 0.9, maxy * 1.1);
+  TH2F* hist = new TH2F(canvasName.c_str(), canvasName.c_str(), 100, 0, 1000, 100, miny * 0.9, maxy * 1.1);
+  hist->SetMarkerStyle(21);
+  hist->SetMarkerColor(kBlue);
   for (const std::pair<double, double>& p : yields) {
     // don't plot background yields
     if (p.first < 100) {
       continue;
     }
-    hist->SetMarkerStyle(21);
-    hist->SetMarkerColor(kBlue);
+    
     hist->Fill(p.first, p.second);
-    hist->Draw();
   }
   
+  hist->Draw("p");
   c->Print(outputFolder + "yields.pdf");
 }
 
