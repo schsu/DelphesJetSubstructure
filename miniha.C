@@ -58,6 +58,19 @@ AnalyzeSignalForAllMasses() {
   }
 }
 
+void
+AnalyzeBackgroundSlices() {
+  double xsections[] = { 14.59, 0.7155, 0.0668, 0.01246, 0.003444, 0.001215, 0.0007277, 0.0001713 };
+  double masses[] = { 0.0, 100.0, 200.0, 300.0, 400.0, 500.0, 600.0, 700.0 };
+  for (int i = 0; i < 8; ++i) {
+    char fileName[1024];
+    sprintf(fileName, "mintree_jetsub_background-%d.root", 101+i);
+    HiggsHist(inputFolder, fileName, outputFolder, xsections[i], 1.0, 50000);
+    std::cout << "Done with background " << i << std::endl;
+    std::cout.flush();
+  }
+}
+
 std::map<double, double>
 CalculateSignificance(std::map<double, double>& yield) {
   std::map<double, double> significance;
@@ -172,6 +185,8 @@ int main(int argc, char* argv[]) {
 
   PlotYields();
   PlotSignificance();
+
+  AnalyzeBackgroundSlices();
 
   return 0;
 }
