@@ -235,7 +235,7 @@ void CHiggsHist::ProcessEvent() {
             std::copy_if(jetFilterPt.begin(), jetFilterPt.end(), std::back_inserter(jetFilterBTag), [btagFlag](jetInfo& ji) { return ((ji.second & btagFlag) != 0); });
             if (jetFilterBTag.size() > 0) {
                 Fill("Flow Cut", 90);
-                if (jetFilterBTag[0].first.M() > 106.0 && jetFilterBTag[0].first.M() < 146.0) {
+                if (jetFilterBTag[0].first.M() > 126.0-15.0 && jetFilterBTag[0].first.M() < 126.0+15.0) {
                     Fill("Flow Cut", 100);
                     Fill("m(ll),bl", dileptonMass, xsection * btagEfficiency);
                     Fill("pT(ll),bl", dileptonPt, xsection * btagEfficiency);
@@ -258,7 +258,7 @@ void CHiggsHist::ProcessEvent() {
             std::copy_if(jetFilterPt.begin(), jetFilterPt.end(), std::back_inserter(jetFilterBTag), [btagFlag](jetInfo& ji) { return ((ji.second & btagFlag) != 0); });
             if (jetFilterBTag.size() > 0) {
                 Fill("Flow Cut", 130);
-                if (jetFilterBTag[0].first.M() > 106.0 && jetFilterBTag[0].first.M() < 146.0) {
+                if (jetFilterBTag[0].first.M() > 126.0-15.0 && jetFilterBTag[0].first.M() < 126.0+15.0) {
                     Fill("Flow Cut", 140);
                     Fill("m(ll),bh", dileptonMass, xsection * btagEfficiency);
                     Fill("pT(ll),bh", dileptonPt, xsection * btagEfficiency);
