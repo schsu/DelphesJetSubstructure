@@ -407,7 +407,7 @@ CJetSubstructure::Prune(Jet* jet) {
 		// find axes
 		fastjet::JetDefinition jet_def = fastjet::JetDefinition(fastjet::kt_algorithm,2.0*0.3);
 		fastjet::ClusterSequence cs(constJets,jet_def);
-        std::vector<fastjet::PseudoJet> inclusiveJets = cs.inclusive_jets();
+        std::vector<fastjet::PseudoJet> inclusiveJets = sorted_by_pt(cs.inclusive_jets());
         if (inclusiveJets.size() > 0) {
             fastjet::PseudoJet leadingJet = inclusiveJets[0];
             fastjet::JetAlgorithm pruneAlgo = fastjet::cambridge_algorithm;

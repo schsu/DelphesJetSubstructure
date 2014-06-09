@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Sun May 11 17:17:21 2014 by ROOT version 5.34/18
+// Sun Jun  8 20:12:27 2014 by ROOT version 5.34/18
 // from TTree DelphesNTup/DelphesNTup
-// found on file: mintree_jetsub_a-zh-triple-1000GeV.root
+// found on file: mintree_jetsub_a-zh-350GeV.root
 //////////////////////////////////////////////////////////
 
 #ifndef DelphesNTuple_h
@@ -35,6 +35,14 @@ public :
    vector<double>  *jets_antikt_10_y;
    vector<double>  *jets_antikt_10_z;
    vector<double>  *jets_antikt_10_t;
+   vector<double>  *jets_pruned_6_x;
+   vector<double>  *jets_pruned_6_y;
+   vector<double>  *jets_pruned_6_z;
+   vector<double>  *jets_pruned_6_t;
+   vector<double>  *jets_pruned_10_x;
+   vector<double>  *jets_pruned_10_y;
+   vector<double>  *jets_pruned_10_z;
+   vector<double>  *jets_pruned_10_t;
    vector<double>  *tau1_4;
    vector<double>  *tau2_4;
    vector<double>  *tau3_4;
@@ -79,6 +87,14 @@ public :
    TBranch        *b_jets_antikt_10_y;   //!
    TBranch        *b_jets_antikt_10_z;   //!
    TBranch        *b_jets_antikt_10_t;   //!
+   TBranch        *b_jets_pruned_6_x;   //!
+   TBranch        *b_jets_pruned_6_y;   //!
+   TBranch        *b_jets_pruned_6_z;   //!
+   TBranch        *b_jets_pruned_6_t;   //!
+   TBranch        *b_jets_pruned_10_x;   //!
+   TBranch        *b_jets_pruned_10_y;   //!
+   TBranch        *b_jets_pruned_10_z;   //!
+   TBranch        *b_jets_pruned_10_t;   //!
    TBranch        *b_tau1_4;   //!
    TBranch        *b_tau2_4;   //!
    TBranch        *b_tau3_4;   //!
@@ -129,9 +145,9 @@ DelphesNTuple::DelphesNTuple(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("mintree_jetsub_a-zh-triple-1000GeV.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("mintree_jetsub_a-zh-350GeV.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("mintree_jetsub_a-zh-triple-1000GeV.root");
+         f = new TFile("mintree_jetsub_a-zh-350GeV.root");
       }
       f->GetObject("DelphesNTup",tree);
 
@@ -187,6 +203,14 @@ void DelphesNTuple::Init(TTree *tree)
    jets_antikt_10_y = 0;
    jets_antikt_10_z = 0;
    jets_antikt_10_t = 0;
+   jets_pruned_6_x = 0;
+   jets_pruned_6_y = 0;
+   jets_pruned_6_z = 0;
+   jets_pruned_6_t = 0;
+   jets_pruned_10_x = 0;
+   jets_pruned_10_y = 0;
+   jets_pruned_10_z = 0;
+   jets_pruned_10_t = 0;
    tau1_4 = 0;
    tau2_4 = 0;
    tau3_4 = 0;
@@ -235,6 +259,14 @@ void DelphesNTuple::Init(TTree *tree)
    fChain->SetBranchAddress("jets_antikt_10_y", &jets_antikt_10_y, &b_jets_antikt_10_y);
    fChain->SetBranchAddress("jets_antikt_10_z", &jets_antikt_10_z, &b_jets_antikt_10_z);
    fChain->SetBranchAddress("jets_antikt_10_t", &jets_antikt_10_t, &b_jets_antikt_10_t);
+   fChain->SetBranchAddress("jets_pruned_6_x", &jets_pruned_6_x, &b_jets_pruned_6_x);
+   fChain->SetBranchAddress("jets_pruned_6_y", &jets_pruned_6_y, &b_jets_pruned_6_y);
+   fChain->SetBranchAddress("jets_pruned_6_z", &jets_pruned_6_z, &b_jets_pruned_6_z);
+   fChain->SetBranchAddress("jets_pruned_6_t", &jets_pruned_6_t, &b_jets_pruned_6_t);
+   fChain->SetBranchAddress("jets_pruned_10_x", &jets_pruned_10_x, &b_jets_pruned_10_x);
+   fChain->SetBranchAddress("jets_pruned_10_y", &jets_pruned_10_y, &b_jets_pruned_10_y);
+   fChain->SetBranchAddress("jets_pruned_10_z", &jets_pruned_10_z, &b_jets_pruned_10_z);
+   fChain->SetBranchAddress("jets_pruned_10_t", &jets_pruned_10_t, &b_jets_pruned_10_t);
    fChain->SetBranchAddress("tau1_4", &tau1_4, &b_tau1_4);
    fChain->SetBranchAddress("tau2_4", &tau2_4, &b_tau2_4);
    fChain->SetBranchAddress("tau3_4", &tau3_4, &b_tau3_4);
