@@ -34,6 +34,7 @@ private:
     std::vector<jetInfo> ConvertBranchToJetVector(std::vector<double>& x, std::vector<double>& y, std::vector<double>&z, std::vector<double>& t, std::vector<int>& btag);
     std::vector<TLorentzVector> SelectGoodLeptons(std::vector<TLorentzVector>& leptons, double minPt, double maxEta);
     std::vector<jetInfo> SelectGoodJets(std::vector<jetInfo>& jets, std::vector<TLorentzVector>& electrons);
+    void ProcessBoostedJet(int initialCutFlow, std::vector<jetInfo>& jets, double cone, const std::string& suffix, TLorentzVector dilepton);
 public:
     double fullEventCount;
     double amass;
@@ -148,6 +149,32 @@ CHiggsHist::ConvertBranchToJetVector(std::vector<double>& x, std::vector<double>
     return result;
 }
 
+void CHiggsHist::ProcessBoostedJet(int initialCutFlow, std::vector<jetInfo>& jets, double cone, const std::string& suffix, TLorentzVector dilepton) {
+    int btagFlag = 2;
+    double btagEfficiency = 0.7;
+    Fill("Flow Cut", initialCutFlow);
+    std::vector<jetInfo> jetFilterPt;
+    std::copy_if(jets.begin(), jets.end(), std::back_inserter(jetFilterPt), [cone](jetInfo& ji) { return ji.first.Pt() > 2.0 * 126.0 / cone; });
+    if (jetFilterPt.size() > 0) {
+        Fill("Flow Cut", initialCutFlow + 10);
+        std::vector<jetInfo> jetFilterBTag;
+        std::copy_if(jetFilterPt.begin(), jetFilterPt.end(), std::back_inserter(jetFilterBTag), [btagFlag](jetInfo& ji) { return ((ji.second & btagFlag) != 0); });
+        if (jetFilterBTag.size() > 0) {
+            Fill("Flow Cut", initialCutFlow + 20);
+            if (jetFilterBTag[0].first.M() > 126.0-150.0 && jetFilterBTag[0].first.M() < 126.0+15000.0) {
+                Fill("Flow Cut", initialCutFlow + 30);
+                Fill("m(ll)," + suffix, dilepton.M(), xsection * btagEfficiency);
+                Fill("pT(ll)," + suffix, dilepton.Pt(), xsection * btagEfficiency);
+                Fill("m(bb)," + suffix, jetFilterBTag[0].first.M(), xsection * btagEfficiency);
+                Fill("pT(bb)," + suffix, jetFilterBTag[0].first.Pt(), xsection * btagEfficiency);
+                Fill("m(llbb)," + suffix, (jetFilterBTag[0].first+dilepton).M(), xsection * btagEfficiency);
+                Fill("pT(llbb)," + suffix, (jetFilterBTag[0].first+dilepton).Pt(), xsection * btagEfficiency);
+            }
+        }
+    }
+    
+}
+
 void CHiggsHist::ProcessEvent() {
     double btagEfficiency = 0.7;
     double leptonMinPt = 5.0;
@@ -213,9 +240,14 @@ void CHiggsHist::ProcessEvent() {
     std::vector<jetInfo> jetsMid = ConvertBranchToJetVector(*mt->jets_antikt_6_x, *mt->jets_antikt_6_y, *mt->jets_antikt_6_z, *mt->jets_antikt_6_t, *mt->btags6);
     std::vector<jetInfo> jetsHigh = ConvertBranchToJetVector(*mt->jets_antikt_10_x, *mt->jets_antikt_10_y, *mt->jets_antikt_10_z, *mt->jets_antikt_10_t, *mt->btags10);
     
+    std::vector<jetInfo> jetsPrunedMid = ConvertBranchToJetVector(*mt->jets_pruned_6_x, *mt->jets_pruned_6_y, *mt->jets_pruned_6_z, *mt->jets_pruned_6_t, *mt->btags6);
+    std::vector<jetInfo> jetsPrunedHigh = ConvertBranchToJetVector(*mt->jets_pruned_10_x, *mt->jets_pruned_10_y, *mt->jets_pruned_10_z, *mt->jets_pruned_10_t, *mt->btags10);
+    
     jetsLow = SelectGoodJets(jetsLow, goodElectrons);
     jetsMid = SelectGoodJets(jetsMid, goodElectrons);
     jetsHigh = SelectGoodJets(jetsHigh, goodElectrons);
+    jetsPrunedMid = SelectGoodJets(jetsPrunedMid, goodElectrons);
+    jetsPrunedHigh = SelectGoodJets(jetsPrunedHigh, goodElectrons);
     
     int btagFlag = 2;
     
@@ -242,66 +274,10 @@ void CHiggsHist::ProcessEvent() {
     }
     
     if (!resolved) {
-        Fill("Flow Cut", 70);
-        std::vector<jetInfo> jetFilterPt;
-        std::copy_if(jetsMid.begin(), jetsMid.end(), std::back_inserter(jetFilterPt), [](jetInfo& ji) { return ji.first.Pt() > 2.0 * 126.0 / .8; });
-        if (jetFilterPt.size() > 0) {
-            Fill("Flow Cut", 80);
-            std::vector<jetInfo> jetFilterBTag;
-            std::copy_if(jetFilterPt.begin(), jetFilterPt.end(), std::back_inserter(jetFilterBTag), [btagFlag](jetInfo& ji) { return ((ji.second & btagFlag) != 0); });
-            if (jetFilterBTag.size() > 0) {
-                Fill("Flow Cut", 90);
-                if (jetFilterBTag[0].first.M() > 126.0-150.0 && jetFilterBTag[0].first.M() < 126.0+15000.0) {
-                    Fill("Flow Cut", 100);
-                    Fill("m(ll),bl", dileptonMass, xsection * btagEfficiency);
-                    Fill("pT(ll),bl", dileptonPt, xsection * btagEfficiency);
-                    Fill("m(bb),bl", jetFilterBTag[0].first.M(), xsection * btagEfficiency);
-                    Fill("pT(bb),bl", jetFilterBTag[0].first.Pt(), xsection * btagEfficiency);
-                    Fill("m(llbb),bl", (jetFilterBTag[0].first+dilepton[0]+dilepton[1]).M(), xsection * btagEfficiency);
-                    Fill("pT(llbb),bl", (jetFilterBTag[0].first+dilepton[0]+dilepton[1]).Pt(), xsection * btagEfficiency);
-                }
-            }
-        }
-    }
-    
-    if (!resolved) {
-        Fill("Flow Cut", 110);
-        std::vector<jetInfo> jetFilterPt;
-        std::copy_if(jetsHigh.begin(), jetsHigh.end(), std::back_inserter(jetFilterPt), [](jetInfo& ji) { return ji.first.Pt() > 2.0 * 126.0 / 1.2; });
-        if (jetFilterPt.size() > 0) {
-            Fill("Flow Cut", 120);
-            std::vector<jetInfo> jetFilterBTag;
-            std::copy_if(jetFilterPt.begin(), jetFilterPt.end(), std::back_inserter(jetFilterBTag), [btagFlag](jetInfo& ji) { return ((ji.second & btagFlag) != 0); });
-            if (jetFilterBTag.size() > 0) {
-                Fill("Flow Cut", 130);
-                if (jetFilterBTag[0].first.M() > 126.0-150.0 && jetFilterBTag[0].first.M() < 126.0+15000.0) {
-                    Fill("Flow Cut", 140);
-                    Fill("m(ll),bh", dileptonMass, xsection * btagEfficiency);
-                    Fill("pT(ll),bh", dileptonPt, xsection * btagEfficiency);
-                    Fill("m(bb),bh", jetFilterBTag[0].first.M(), xsection * btagEfficiency);
-                    Fill("pT(bb),bh", jetFilterBTag[0].first.Pt(), xsection * btagEfficiency);
-                    Fill("m(llbb),bh", (jetFilterBTag[0].first+dilepton[0]+dilepton[1]).M(), xsection);
-                    Fill("pT(llbb),bh", (jetFilterBTag[0].first+dilepton[0]+dilepton[1]).Pt(), xsection);
-                    
-                    TLorentzVector a = jetFilterBTag[0].first + dilepton[0] + dilepton[1];
-                    Fill("pt vs mass", std::pair<float, float>(a.M(), a.Eta()));
-                    // Do some special processing for the unusual peak
-                    if ((jetFilterBTag[0].first+dilepton[0]+dilepton[1]).M() > 150 && (jetFilterBTag[0].first+dilepton[0]+dilepton[1]).M() < 400) {
-                        Fill("m(s)", (jetFilterBTag[0].first+dilepton[0]+dilepton[1]).M());
-                        Fill("pT(s)", (jetFilterBTag[0].first+dilepton[0]+dilepton[1]).Pt());
-                        Fill("eta(s)", (jetFilterBTag[0].first+dilepton[0]+dilepton[1]).Eta());
-                        Fill("phi(s)", (jetFilterBTag[0].first+dilepton[0]+dilepton[1]).Phi());
-                        Fill("m(sj)", jetFilterBTag[0].first.M());
-                        Fill("pt(sj)", jetFilterBTag[0].first.Pt());
-                        Fill("eta(sj)", jetFilterBTag[0].first.Eta());
-                        Fill("phi(sj)", jetFilterBTag[0].first.Phi());
-                        Fill("pt vs mass(s)", std::pair<float, float>(a.M(), a.Eta()));
-                        Fill("delta phi", jetFilterBTag[0].first.DeltaPhi(dileptonFourVector));
-                        Fill("delta r", jetFilterBTag[0].first.DeltaR(dileptonFourVector));
-                    }
-                }
-            }
-        }
+        ProcessBoostedJet(70, jetsMid, 0.8, "bl", dileptonFourVector);
+        ProcessBoostedJet(110, jetsHigh, 1.2, "bh", dileptonFourVector);
+        ProcessBoostedJet(150, jetsPrunedMid, 0.8, "blp", dileptonFourVector);
+        ProcessBoostedJet(190, jetsPrunedHigh, 1.2, "bhp", dileptonFourVector);
     }
     
     return;

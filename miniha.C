@@ -54,6 +54,7 @@ AnalyzeSignalForAllMasses() {
     for (int i = 0; i < amassesCount; ++i) {
         char fileName[1024];
         sprintf(fileName, "mintree_jetsub_a-zh-%dGeV.root", amasses[i]);
+	std::cout << fileName << std::endl;
         for (size_t j = 0; j < amassesCount; j++) {
             xsections[j] = 1.0;
         }
