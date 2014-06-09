@@ -103,7 +103,7 @@ CJetSubstructure::ProcessEvent() {
 
   StoreJets(goodJets4, pjets_4, ptaus_4, btags_4, false);
   StoreJets(goodJets6, pjets_6, ptaus_6, btags_6, false);
-  StoreJets(goodJets10, pjets_10, ptaus_10, btags_10, true);
+  StoreJets(goodJets10, pjets_10, ptaus_10, btags_10, false);
 
   ptree->Fill();
 }

@@ -36,6 +36,7 @@ CXXFLAGSLINK = -Wall -g -O3 -Wno-long-long $(FJFLAGS) $(ROOTCFLAGS) $(INCLUDES)
 
 
 FILES = Qjets.o QjetsPlugin.o 
+ANAFILES  = HelperClasses.o LocalSettings.o HiggsAnalysis.o analljj.o
 FILEROOT  = HelperClasses.o LocalSettings.o HiggsAnalysis.o JetSubstructure.o Run.o 
 MINIFILES = DelphesNTuple.o miniha.o HiggsHist.o HelperClasses.o LocalSettings.o AtlasStyle.o
 
@@ -47,6 +48,8 @@ lib/libQjets.a: $(FILES) $(FILES:.cc=.o)
 lib/libQjets.so: $(FILES) $(FILES:.cc=.o)
 	$(CXX) $(CXXFLAGS) $(SOFLAGS) -o $@ $(FILES)
 
+analljj:$(FILES) $(ANAFILES)
+	$(CXX) $(CXXFLAGSLINK) $(ANAFILES) -lQjets -lDelphes -L./lib -L$(DELPHESPATH) $(ROOTGLIBS) $(FJLIBS) -o $@
 
 ha: $(FILES) $(FILEROOT)
 	$(CXX) $(CXXFLAGSLINK) $(FILEROOT) -lQjets  -lDelphes -L./lib -L$(DELPHESPATH) $(ROOTGLIBS) $(FJLIBS) -o $@
