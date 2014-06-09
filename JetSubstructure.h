@@ -23,10 +23,12 @@ private:
 	double qj_mAverage;
 	double qj_mRMSS;
 	double qj_mRMS;
-
+    
 	CFourVectorBranch *pjets_4;
 	CFourVectorBranch *pjets_6;
 	CFourVectorBranch *pjets_10;
+    CFourVectorBranch *prjets_6;
+    CFourVectorBranch *prjets_10;
 	CFourVectorBranch *pmuons;
 	CFourVectorBranch *pelectrons;
 	CTaus *ptaus_4;
@@ -37,12 +39,12 @@ private:
 	SimpleScalarBranch<int> *btags_4;
 	SimpleScalarBranch<int> *btags_6;
 	SimpleScalarBranch<int> *btags_10;
-
+    
 	TTree* ptree;
 public:
 	CJetSubstructure();
 	virtual ~CJetSubstructure();
-
+    
 	virtual void ProcessEvent();
 	virtual void ProcessHistograms();
   	void SelectGoodJets(std::vector<BaseParticle*>& goodJets, TClonesArray* branchJets, const std::vector<BaseParticle*>& goodElectrons);
@@ -50,10 +52,11 @@ public:
  	virtual void SaveResults();
  	void Reset();
  	double NSubJettiness(Jet* jet, int n, double r0);
- 	void StoreJets(vector<BaseParticle*>& jets, CFourVectorBranch* pfv, CTaus* ptaus, SimpleScalarBranch<int>* btags, bool doQjets);
+ 	void StoreJets(vector<BaseParticle*>& jets, CFourVectorBranch* pfv, CFourVectorBranch* prfv, CTaus* ptaus, SimpleScalarBranch<int>* btags, bool doQjets);
 	template <class QJPlugin> void QJetsGeneric(Jet* jet);
  	void CalculateVolatility(Jet* jet, std::vector<TLorentzVector>& jets);
 	void VerifyConstituents();
+    TLorentzVector Prune(Jet* jet);
 };
 
 int JetSubstructure(const char* inputFolder, const char* inputFile, const char* outputFolder, double xsection, double coneSize);

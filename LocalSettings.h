@@ -6,5 +6,7 @@
 extern TString outputFolder;
 extern TString inputFolder;
 extern TString libDelphesPath;
-
+extern int amasses[];
+extern double xsections[];
+extern const int amassesCount;
 #endif

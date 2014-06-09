@@ -156,27 +156,43 @@ void CHiggsHist::ProcessEvent() {
     
     std::vector<TLorentzVector> electrons = ConvertBranchToVector(*mt->electrons_x, *mt->electrons_y, *mt->electrons_z, *mt->electrons_t);
     std::vector<TLorentzVector> muons = ConvertBranchToVector(*mt->muons_x, *mt->muons_y, *mt->muons_z, *mt->muons_t);
+
+    Fill("e mult", electrons.size());
+    Fill("m mult", muons.size());
+
+    if (electrons.size() > 0) {
+	Fill("lead e pT", electrons[0].Pt());
+    }
+
+    if (muons.size() > 0) {
+	Fill("lead m pT", muons[0].Pt());
+    }
     
     std::vector<TLorentzVector> goodElectrons = SelectGoodLeptons(electrons, leptonMinPt, leptonMaxEta);
     std::vector<TLorentzVector> goodMuons = SelectGoodLeptons(muons, leptonMinPt, leptonMaxEta);
     
+    Fill("e post mult", goodElectrons.size());
+    Fill("m post mult", goodMuons.size());
+
+    Fill("crossed", goodElectrons.size() * goodMuons.size());
+
     Fill("Flow Cut", 10);
     
-    bool matchingLeptons = (goodElectrons.size() == 2 && goodMuons.size() == 0) || (goodElectrons.size() == 0 && goodMuons.size() == 2);
+    bool matchingLeptons = (goodElectrons.size() >= 2 && goodMuons.size() >= 0) || (goodElectrons.size() >= 0 && goodMuons.size() >= 2);
     if (!matchingLeptons) {
-        return;
+	return;
     }
     
     Fill("Flow Cut", 20);
     
     std::vector<TLorentzVector> dilepton;
-    if (goodElectrons.size() == 2) {
+    if (goodElectrons.size() >= 2) {
         dilepton = goodElectrons;
-    } else {
+    } else if (goodMuons.size() >= 2) {
         dilepton = goodMuons;
-    }
+    } 
     
-    if (dilepton.size() != 2) {
+    if (dilepton.size() < 2) {
         std::cout << "Something went wrong - there shoudl be exactly two leptons here." << std::endl;
         return;
     }
@@ -212,7 +228,7 @@ void CHiggsHist::ProcessEvent() {
             Fill("Flow Cut", 50);
             
             TLorentzVector dijet = jetsLowBtagged[0].first + jetsLowBtagged[1].first;
-            if (dijet.M() > 126.0-15.0 && dijet.M() < 126.0+15.0) {
+            if (dijet.M() > 126.0-150.0 && dijet.M() < 126.0+15000.0) {
                 Fill("Flow Cut", 60);
                 Fill("m(ll),r", dileptonMass, xsection * btagEfficiency * btagEfficiency);
                 Fill("pT(ll),r", dileptonPt, xsection * btagEfficiency * btagEfficiency);
@@ -235,7 +251,7 @@ void CHiggsHist::ProcessEvent() {
             std::copy_if(jetFilterPt.begin(), jetFilterPt.end(), std::back_inserter(jetFilterBTag), [btagFlag](jetInfo& ji) { return ((ji.second & btagFlag) != 0); });
             if (jetFilterBTag.size() > 0) {
                 Fill("Flow Cut", 90);
-                if (jetFilterBTag[0].first.M() > 126.0-15.0 && jetFilterBTag[0].first.M() < 126.0+15.0) {
+                if (jetFilterBTag[0].first.M() > 126.0-150.0 && jetFilterBTag[0].first.M() < 126.0+15000.0) {
                     Fill("Flow Cut", 100);
                     Fill("m(ll),bl", dileptonMass, xsection * btagEfficiency);
                     Fill("pT(ll),bl", dileptonPt, xsection * btagEfficiency);
@@ -258,7 +274,7 @@ void CHiggsHist::ProcessEvent() {
             std::copy_if(jetFilterPt.begin(), jetFilterPt.end(), std::back_inserter(jetFilterBTag), [btagFlag](jetInfo& ji) { return ((ji.second & btagFlag) != 0); });
             if (jetFilterBTag.size() > 0) {
                 Fill("Flow Cut", 130);
-                if (jetFilterBTag[0].first.M() > 126.0-15.0 && jetFilterBTag[0].first.M() < 126.0+15.0) {
+                if (jetFilterBTag[0].first.M() > 126.0-150.0 && jetFilterBTag[0].first.M() < 126.0+15000.0) {
                     Fill("Flow Cut", 140);
                     Fill("m(ll),bh", dileptonMass, xsection * btagEfficiency);
                     Fill("pT(ll),bh", dileptonPt, xsection * btagEfficiency);

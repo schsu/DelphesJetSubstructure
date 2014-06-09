@@ -436,18 +436,21 @@ GlobalData::GlobalData() {
 }
 
 GlobalData::~GlobalData() {
-  std::cout << "Resolved yields:" << std::endl;
-  for (const std::pair<double, double>& p : resolvedYield) {
-    std::cout << p.first << "->" << p.second << std::endl;
-  }
+    if (resolvedYield.size() > 0) {
 
-  std::cout << "Boosted low yields:" << std::endl;
-  for (const std::pair<double, double>& p : boostedLowYield) {
-    std::cout << p.first << "->" << p.second << std::endl;
-  }
+	std::cout << "Resolved yields:" << std::endl;
+	for (const std::pair<double, double>& p : resolvedYield) {
+	    std::cout << p.first << "->" << p.second << std::endl;
+	}
 
-  std::cout << "Boosted high yeilds: " << std::endl;
-  for (const std::pair<double, double>& p : boostedHighYield) {
-    std::cout << p.first << "->" << p.second << std::endl;
-  }
+	std::cout << "Boosted low yields:" << std::endl;
+	for (const std::pair<double, double>& p : boostedLowYield) {
+	    std::cout << p.first << "->" << p.second << std::endl;
+	}
+
+	std::cout << "Boosted high yields: " << std::endl;
+	for (const std::pair<double, double>& p : boostedHighYield) {
+	    std::cout << p.first << "->" << p.second << std::endl;
+	}
+    }
 }
