@@ -37,7 +37,6 @@ void RunHeavyHiggsThread(TString inputFile) {
 void RunHeavyHiggs(TString coneSize, float fcs) {
   TString baseName = "a-zh-";
   TString masses[] = {
-#if 0
     "250GeV",
     "300GeV",
     "350GeV",
@@ -58,7 +57,6 @@ void RunHeavyHiggs(TString coneSize, float fcs) {
     "1800GeV",
     "1900GeV",
     "2000GeV",
-#endif
     "2200GeV",
     "2400GeV",
     "2600GeV",

@@ -39,8 +39,9 @@ FILES = Qjets.o QjetsPlugin.o
 ANAFILES  = HelperClasses.o LocalSettings.o HiggsAnalysis.o analljj.o
 FILEROOT  = HelperClasses.o LocalSettings.o HiggsAnalysis.o JetSubstructure.o Run.o 
 MINIFILES = DelphesNTuple.o miniha.o HiggsHist.o HelperClasses.o LocalSettings.o AtlasStyle.o
+EXTRAFILES = Extras.o LocalSettings.o HelperClasses.o
 
-all:  $(FILES) $(FILEROOT)  lib/libQjets.a  ha sample miniha
+all:  $(FILES) $(FILEROOT)  lib/libQjets.a  ha sample miniha extras
 
 lib/libQjets.a: $(FILES) $(FILES:.cc=.o)
 	ar cq lib/libQjets.a $(FILES)
@@ -59,14 +60,9 @@ miniha: $(MINIFILES)
 
 sample: sample.o
 	$(CXX) $(CXXFFLAGSLINK) sample.o   -lDelphes -L./lib -L$(DELPHESPATH) $(ROOTGLIBS) $(FJLIBS) -o $@
-# QPrune: QPrune.o
-# 	@echo "Building $@	 ..."
-# 	$(CXX) $(CXXFLAGS) QPrune.o Root_routinesDict.o\
-# 		$(HepMClib) \
-# 	        $(FJLIBS) -lNsubjettiness\
-# 		-lQjets  -lRoot_routines  -L./lib \
-# 	        $(ROOTGLIBS) -o $@
 
+extras: $(EXTRAFILES)
+	$(CXX) $(CXXFFLAGSLINK) $(EXTRAFILES) -lDelphes -L$(DELPHESPATH) $(ROOTGLIBS) -o $@
 
 .o: %.C %.h
 	rm  lib/*; g++ -fPIC  -O3 -c $(ROOTCFLAGS)  $(FJFLAGS) $< -o $@ 

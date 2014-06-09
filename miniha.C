@@ -51,13 +51,15 @@ AnalyzeBackground() {
 
 void
 AnalyzeSignalForAllMasses() {
-    int masses[] = { 250, 300, 350, 400, 500, 600, 700, 800, 900, 1000 };
-    double xsections[] = { 0.405, 0.493, 0.0473, 0.0114, 0.00431, 0.00205, 0.00106, 0.000577, 0.000326, 0.000189 };
-    for (int i = 0; i < sizeof(masses)/sizeof(masses[0]); ++i) {
+    for (int i = 0; i < amassesCount; ++i) {
         char fileName[1024];
-        sprintf(fileName, "mintree_jetsub_a-zh-%dGeV.root", masses[i]);
-        HiggsHist(inputFolder, fileName, outputFolder, xsections[i], masses[i], 50000);
-        std::cout << "Done with " << masses[i] << "GeV" << std::endl;
+        sprintf(fileName, "mintree_jetsub_a-zh-%dGeV.root", amasses[i]);
+        for (size_t j = 0; j < amassesCount; j++) {
+            xsections[j] = 1.0;
+        }
+        
+        HiggsHist(inputFolder, fileName, outputFolder, xsections[i], amasses[i], 50000);
+        std::cout << "Done with " << amasses[i] << "GeV" << std::endl;
         std::cout.flush();
     }
 }
@@ -112,7 +114,7 @@ PlotYields(const std::string& graphName, const std::string& name, std::map<doubl
     double miny = std::min_element(yields.begin(), yields.end(), [](std::pair<double, double> p, std::pair<double, double> q) { return p.second < q.second; })->second;
     double maxy = std::max_element(yields.begin(), yields.end(), [](std::pair<double, double> p, std::pair<double, double> q) { return p.second < q.second; })->second;
     
-    TH1F* hist = new TH1F((graphName+name).c_str(), graphName.c_str(), 1800, 200, 1100);
+    TH1F* hist = new TH1F((graphName+name).c_str(), graphName.c_str(), 5400, 200, 3100);
     hist->SetMarkerStyle(21+pass);
     hist->SetMarkerColor(pass > lastColor ? lastColor : colors[pass]);
     hist->GetXaxis()->SetTitle("mA, GeV");
@@ -199,9 +201,9 @@ PlotEfficiency() {
     TLegend* legend = new TLegend(0.2, 0.8, 0.4, 0.7);
     SetAtlasStyle();
     
-    PlotYields("Efficiency", "resolved", effResolved, legend, "");
-    PlotYields("Efficiency", "boosted 1.2", effHigh, legend, "");
     PlotYields("Efficiency", "boosted 0.8", effLow, legend, "");
+    PlotYields("Efficiency", "boosted 1.2", effHigh, legend, "");
+    PlotYields("Efficiency", "resolved", effResolved, legend, "");
     
     legend->Draw("ACp");
     c->Print(outputFolder + "efficiency.pdf");
