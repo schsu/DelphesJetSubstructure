@@ -40,8 +40,9 @@ ANAFILES  = HelperClasses.o LocalSettings.o HiggsAnalysis.o analljj.o
 FILEROOT  = HelperClasses.o LocalSettings.o HiggsAnalysis.o JetSubstructure.o Run.o 
 MINIFILES = DelphesNTuple.o miniha.o HiggsHist.o HelperClasses.o LocalSettings.o AtlasStyle.o
 EXTRAFILES = Extras.o LocalSettings.o HelperClasses.o
+TRUTHBTFILES = TruthBTag.o 
 
-all:  $(FILES) $(FILEROOT)  lib/libQjets.a  ha sample miniha extras
+all:  $(FILES) $(FILEROOT)  lib/libQjets.a  ha sample miniha extras truthbtag
 
 lib/libQjets.a: $(FILES) $(FILES:.cc=.o)
 	ar cq lib/libQjets.a $(FILES)
@@ -63,6 +64,9 @@ sample: sample.o
 
 extras: $(EXTRAFILES)
 	$(CXX) $(CXXFFLAGSLINK) $(EXTRAFILES) -lDelphes -L$(DELPHESPATH) $(ROOTGLIBS) -o $@
+
+truthbtag: $(TRUTHBTFILES)
+	$(CXX) $(CXXFLAGSLINK) $(TRUTHBTFILES) -lDelphes -L$(DELPHESPATH) $(ROOTGLIBS) -o $@
 
 .o: %.C %.h
 	rm  lib/*; g++ -fPIC  -O3 -c $(ROOTCFLAGS)  $(FJFLAGS) $< -o $@ 
