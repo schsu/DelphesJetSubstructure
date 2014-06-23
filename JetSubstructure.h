@@ -52,11 +52,11 @@ public:
  	virtual void SaveResults();
  	void Reset();
  	double NSubJettiness(Jet* jet, int n, double r0);
- 	void StoreJets(vector<BaseParticle*>& jets, CFourVectorBranch* pfv, CFourVectorBranch* prfv, CTaus* ptaus, SimpleScalarBranch<int>* btags, bool doQjets);
+ 	void StoreJets(vector<BaseParticle*>& jets, CFourVectorBranch* pfv, CFourVectorBranch* prfv, CTaus* ptaus, SimpleScalarBranch<int>* btags, double cone, bool doQjets);
 	template <class QJPlugin> void QJetsGeneric(Jet* jet);
  	void CalculateVolatility(Jet* jet, std::vector<TLorentzVector>& jets);
 	void VerifyConstituents();
-    TLorentzVector Prune(Jet* jet);
+	TLorentzVector Prune(Jet* jet, double cone);
 };
 
 int JetSubstructure(const char* inputFolder, const char* inputFile, const char* outputFolder, double xsection, double coneSize);

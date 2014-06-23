@@ -13,6 +13,7 @@
 #include "fastjet/PseudoJet.hh"
 #include "fastjet/ClusterSequence.hh"
 #include "fastjet/tools/Pruner.hh"
+#include "fastjet/tools/Filter.hh"
 
 #include "qjet_old/QjetsPlugin.h"
 #include "qjet_old/Qjets.C"
@@ -104,15 +105,15 @@ CJetSubstructure::ProcessEvent() {
     SelectGoodJets(goodJets6, branchJet6, goodElectrons);
     SelectGoodJets(goodJets10, branchJet10, goodElectrons);
     
-    StoreJets(goodJets4, pjets_4, NULL, ptaus_4, btags_4, false);
-    StoreJets(goodJets6, pjets_6, prjets_6, ptaus_6, btags_6, false);
-    StoreJets(goodJets10, pjets_10, prjets_10, ptaus_10, btags_10, true);
+    StoreJets(goodJets4, pjets_4, NULL, ptaus_4, btags_4, 0.4, false);
+    StoreJets(goodJets6, pjets_6, prjets_6, ptaus_6, btags_6, 0.8, false);
+    StoreJets(goodJets10, pjets_10, prjets_10, ptaus_10, btags_10, 1.2, false);
     
     ptree->Fill();
 }
 
 void
-CJetSubstructure::StoreJets(vector<BaseParticle*>& jets, CFourVectorBranch* pfv, CFourVectorBranch* prfv, CTaus* ptaus, SimpleScalarBranch<int>* btags, bool doQjets) {
+CJetSubstructure::StoreJets(vector<BaseParticle*>& jets, CFourVectorBranch* pfv, CFourVectorBranch* prfv, CTaus* ptaus, SimpleScalarBranch<int>* btags, double cone, bool doQjets) {
 	for (size_t i = 0; i < jets.size(); ++i) {
         Jet* ji = (Jet*)jets[i]->underlying();
         pfv->AddEntry(jets[i]->P4());
@@ -124,7 +125,7 @@ CJetSubstructure::StoreJets(vector<BaseParticle*>& jets, CFourVectorBranch* pfv,
         
         // Do some prunning
         if (prfv != NULL) {
-            TLorentzVector prunedJet = Prune(ji);
+	    TLorentzVector prunedJet = Prune(ji, cone);
             prfv->AddEntry(prunedJet);
         }
         
@@ -370,7 +371,7 @@ CJetSubstructure::VerifyConstituents() {
 }
 
 TLorentzVector
-CJetSubstructure::Prune(Jet* jet) {
+CJetSubstructure::Prune(Jet* jet, double cone) {
     TLorentzVector result;
     result.SetPxPyPzE(0.0, 0.0, 0.0, 0.0);
     // Gather the constituents
@@ -405,20 +406,28 @@ CJetSubstructure::Prune(Jet* jet) {
 	
 	if (constJets.size() > 0) {
 		// find axes
-		fastjet::JetDefinition jet_def = fastjet::JetDefinition(fastjet::kt_algorithm,2.0*0.3);
+		fastjet::JetDefinition jet_def = fastjet::JetDefinition(fastjet::antikt_algorithm,cone);
 		fastjet::ClusterSequence cs(constJets,jet_def);
+		//std::cout << cs.inclusive_jets().size() << std::endl;
         std::vector<fastjet::PseudoJet> inclusiveJets = sorted_by_pt(cs.inclusive_jets());
         if (inclusiveJets.size() > 0) {
+	  //std::cout << cs.inclusive_jets()[0].pt() << " " << cs.inclusive_jets()[0].m() << std::endl;
+		//std::cout << jet->P4().Pt() << " " << jet->P4().M() << std::endl << std::endl;
             fastjet::PseudoJet leadingJet = inclusiveJets[0];
             fastjet::JetAlgorithm pruneAlgo = fastjet::cambridge_algorithm;
-            double zcut = 1.0;
+            double zcut = 0.1;
             double rcut = 0.5;
             fastjet::Pruner pruner(pruneAlgo, zcut, rcut);
-            fastjet::PseudoJet prunedJet = pruner(leadingJet);
+	    //std::cout << pruner.description() << std::endl;
+	    fastjet::PseudoJet prunedJet = pruner(leadingJet);
             if (!prunedJet.has_structure_of<fastjet::Pruner>()) {
                 std::cout << "Error: Does not have pruned jet structure!" << std::endl;
             }
-            
+
+	    fastjet::JetDefinition jet_def_trim = fastjet::JetDefinition(fastjet::antikt_algorithm, 0.3);
+	    fastjet::Filter filter(jet_def_trim, fastjet::SelectorPtFractionMin(0.05));
+	    prunedJet = filter(leadingJet);
+
             result.SetPxPyPzE(prunedJet.px(), prunedJet.py(), prunedJet.pz(), prunedJet.e());
         }
 	}
